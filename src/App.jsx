@@ -10,11 +10,11 @@ function App() {
       <div className="app">
         <nav className="navbar">
           <div className="nav-container">
-            <h1 className="nav-title">🎽</h1>
-            <div className="nav-links">
+            <h1 className="nav-title">👕 Pedidos de Camisas Zona I</h1>
+            {/* <div className="nav-links">
               <Link to="/" className="nav-link">Hacer Pedido</Link>
               <Link to="/admin" className="nav-link">Panel Admin</Link>
-            </div>
+            </div> */}
           </div>
         </nav>
         
