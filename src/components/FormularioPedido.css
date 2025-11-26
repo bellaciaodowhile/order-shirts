@@ -2097,7 +2097,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .pantalla-inicial-card {
-    padding: 2rem 1.5rem;
+    padding: 20px 8px;
   }
 
   .pantalla-inicial-header h2 {
