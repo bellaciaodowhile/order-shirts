@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import * as XLSX from 'xlsx'
 import { obtenerDolarHoy, calcularTotalPedido, formatearPrecio } from '../utils/dolarApi'
+import { QRCodeSVG } from 'qrcode.react'
 import './PanelAdmin.css'
 
 function PanelAdmin() {
@@ -17,6 +18,7 @@ function PanelAdmin() {
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null)
   const [montoPago, setMontoPago] = useState('')
   const [referenciaPago, setReferenciaPago] = useState('')
+  const [accordionAbierto, setAccordionAbierto] = useState({})
   const [fechaPago, setFechaPago] = useState('')
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false)
   const [pedidoEditar, setPedidoEditar] = useState(null)
@@ -30,6 +32,13 @@ function PanelAdmin() {
   const cargarDolar = async () => {
     const dolar = await obtenerDolarHoy()
     setDolarHoy(dolar)
+  }
+
+  const toggleAccordion = (pedidoId) => {
+    setAccordionAbierto(prev => ({
+      ...prev,
+      [pedidoId]: !prev[pedidoId]
+    }))
   }
 
   const cargarPedidos = async () => {
@@ -701,6 +710,92 @@ function PanelAdmin() {
                   <span className="detalle-label">⛪ Iglesia:</span>
                   <span className="detalle-valor">{pedido.iglesia}</span>
                 </div>
+
+                {pedido.codigo_unico && (
+                  <div className="accordion-codigo-qr">
+                    <button 
+                      className="accordion-header-codigo"
+                      onClick={() => toggleAccordion(pedido.id)}
+                    >
+                      <span>🔑 Código Único & QR</span>
+                      <span className="accordion-icon">{accordionAbierto[pedido.id] ? '▼' : '▶'}</span>
+                    </button>
+                    
+                    {accordionAbierto[pedido.id] && (
+                      <div className="accordion-content-codigo">
+                        <div className="detalle-row">
+                          <span className="detalle-label">🔑 Código Único:</span>
+                          <div className="codigo-unico-container">
+                            <span className="detalle-valor codigo-unico-admin">{pedido.codigo_unico}</span>
+                            <button 
+                              className="btn-copiar-codigo-admin"
+                              onClick={() => {
+                                navigator.clipboard.writeText(pedido.codigo_unico)
+                                alert('✅ Código copiado al portapapeles')
+                              }}
+                              title="Copiar código"
+                            >
+                              📋
+                            </button>
+                            <a 
+                              href={`/pedido/${pedido.codigo_unico}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn-ver-pedido-admin"
+                              title="Ver pedido"
+                            >
+                              👁️
+                            </a>
+                          </div>
+                        </div>
+
+                        <div className="detalle-row qr-row">
+                          <span className="detalle-label">📱 QR del Pedido:</span>
+                          <div className="qr-pedido-container">
+                            <div className="qr-pedido-wrapper">
+                              <QRCodeSVG 
+                                id={`qr-${pedido.id}`}
+                                value={`${window.location.origin}/pedido/${pedido.codigo_unico}`}
+                                size={120}
+                                level="H"
+                                includeMargin={true}
+                              />
+                            </div>
+                            <button 
+                              className="btn-descargar-qr-admin"
+                              onClick={() => {
+                                const svg = document.querySelector(`#qr-${pedido.id}`)
+                                if (svg) {
+                                  const svgData = new XMLSerializer().serializeToString(svg)
+                                  const canvas = document.createElement('canvas')
+                                  const ctx = canvas.getContext('2d')
+                                  const img = new Image()
+                                  
+                                  img.onload = () => {
+                                    canvas.width = img.width
+                                    canvas.height = img.height
+                                    ctx.drawImage(img, 0, 0)
+                                    const pngFile = canvas.toDataURL('image/png')
+                                    
+                                    const downloadLink = document.createElement('a')
+                                    downloadLink.download = `qr-pedido-${pedido.codigo_unico}.png`
+                                    downloadLink.href = pngFile
+                                    downloadLink.click()
+                                  }
+                                  
+                                  img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
+                                }
+                              }}
+                              title="Descargar QR"
+                            >
+                              📥 Descargar QR
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Lista de camisas */}
                 <div className="detalle-row camisas-header-row">
