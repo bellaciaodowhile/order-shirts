@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import { obtenerDolarHoy, calcularTotalPedido, formatearPrecio } from '../utils/dolarApi'
+import { QRCodeSVG } from 'qrcode.react'
+import { Html5QrcodeScanner } from 'html5-qrcode'
 import './FormularioPedido.css'
 import camisaDirectiva from '../assets/images/directiva.png'
 import camisaNormal from '../assets/images/normal.png'
 
-const TALLAS_TODAS = ['8', '12', '16', 'S', 'M', 'L', 'XL', '2XL']
+const TALLAS_TODAS = ['8', '10', '12', '16', 'S', 'M', 'L', 'XL', '2XL']
 const TALLAS_DIRECTIVA_ZONA = ['16', 'S', 'M', 'L', 'XL', '2XL']
 
 function FormularioPedido() {
@@ -20,6 +22,14 @@ function FormularioPedido() {
   const [mensaje, setMensaje] = useState('')
   const [camisaActual, setCamisaActual] = useState(0)
   const [dolarHoy, setDolarHoy] = useState(null)
+  const [mostrarModal, setMostrarModal] = useState(false)
+  const [pedidoCreado, setPedidoCreado] = useState(null)
+  const [mostrarQR, setMostrarQR] = useState(false)
+  const [mostrarPantallaInicial, setMostrarPantallaInicial] = useState(true)
+  const [codigoIngresado, setCodigoIngresado] = useState('')
+  const [buscandoPedido, setBuscandoPedido] = useState(false)
+  const [mostrarEscaner, setMostrarEscaner] = useState(false)
+  const scannerRef = useRef(null)
 
   useEffect(() => {
     cargarDolar()
@@ -29,6 +39,93 @@ function FormularioPedido() {
     const dolar = await obtenerDolarHoy()
     setDolarHoy(dolar)
   }
+
+  const buscarPedidoPorCodigo = async () => {
+    if (!codigoIngresado.trim()) {
+      alert('Por favor ingresa un código')
+      return
+    }
+
+    setBuscandoPedido(true)
+    try {
+      const { data, error } = await supabase
+        .from('pedidos')
+        .select('*')
+        .eq('codigo_unico', codigoIngresado.trim().toUpperCase())
+        .single()
+
+      if (error || !data) {
+        alert('❌ Código no encontrado. Verifica que sea correcto.')
+        return
+      }
+
+      // Redirigir a la página del pedido
+      window.location.href = `/pedido/${data.codigo_unico}`
+    } catch (error) {
+      console.error('Error:', error)
+      alert('❌ Error al buscar el pedido')
+    } finally {
+      setBuscandoPedido(false)
+    }
+  }
+
+  const hacerNuevoPedido = () => {
+    setMostrarPantallaInicial(false)
+  }
+
+  const abrirEscaner = () => {
+    setMostrarEscaner(true)
+  }
+
+  const cerrarEscaner = () => {
+    if (scannerRef.current) {
+      scannerRef.current.clear()
+      scannerRef.current = null
+    }
+    setMostrarEscaner(false)
+  }
+
+  useEffect(() => {
+    if (mostrarEscaner && !scannerRef.current) {
+      const scanner = new Html5QrcodeScanner(
+        'qr-reader',
+        { 
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        },
+        false
+      )
+
+      scanner.render(
+        (decodedText) => {
+          // Extraer el código del URL escaneado
+          const match = decodedText.match(/\/pedido\/([A-Z0-9]{8})/)
+          
+          if (match && match[1]) {
+            const codigo = match[1]
+            scanner.clear()
+            setMostrarEscaner(false)
+            window.location.href = `/pedido/${codigo}`
+          } else {
+            alert('❌ QR no válido. Asegúrate de escanear el QR de tu pedido.')
+          }
+        },
+        (error) => {
+          // Ignorar errores de escaneo continuo
+          console.log(error)
+        }
+      )
+
+      scannerRef.current = scanner
+    }
+
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear()
+      }
+    }
+  }, [mostrarEscaner])
 
   const agregarCamisa = () => {
     setCamisas([{
@@ -124,15 +221,14 @@ function FormularioPedido() {
     return camisas.length
   }
 
-  const handleSubmit = async (e) => {
+  const abrirModalConfirmacion = (e) => {
     e.preventDefault()
-    setLoading(true)
     setMensaje('')
 
+    // Validaciones antes de abrir el modal
     try {
       if (camisas.length === 0) {
         setMensaje('❌ Debes agregar al menos una camisa')
-        setLoading(false)
         return
       }
 
@@ -140,7 +236,6 @@ function FormularioPedido() {
       const camisasSinTalla = camisas.filter(c => !c.talla)
       if (camisasSinTalla.length > 0) {
         setMensaje('❌ Todas las camisas deben tener una talla seleccionada')
-        setLoading(false)
         return
       }
 
@@ -148,16 +243,29 @@ function FormularioPedido() {
       const camisasDirectivaSinNombre = camisas.filter(c => c.tipo === 'directiva_zona' && !c.nombre)
       if (camisasDirectivaSinNombre.length > 0) {
         setMensaje('❌ Las camisas de Directiva de ZONA deben tener un nombre (detrás)')
-        setLoading(false)
         return
       }
 
       const camisasDirectivaSinTextoFrente = camisas.filter(c => c.tipo === 'directiva_zona' && !c.textoFrente)
       if (camisasDirectivaSinTextoFrente.length > 0) {
         setMensaje('❌ Las camisas de Directiva de ZONA deben tener texto al frente')
-        setLoading(false)
         return
       }
+
+      // Si todas las validaciones pasan, abrir el modal
+      setMostrarModal(true)
+    } catch (error) {
+      console.error('Error en validación:', error)
+      setMensaje('❌ Error al validar el pedido')
+    }
+  }
+
+  const confirmarPedido = async () => {
+    setLoading(true)
+    setMostrarModal(false)
+    setMensaje('')
+
+    try {
 
       const pedido = {
         nombre_persona: nombrePersona,
@@ -177,25 +285,18 @@ function FormularioPedido() {
         created_at: new Date().toISOString()
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('pedidos')
         .insert([pedido])
+        .select()
+        .single()
 
       if (error) throw error
 
+      // Guardar el pedido creado y mostrar el QR
+      setPedidoCreado(data)
+      setMostrarQR(true)
       setMensaje('✅ ¡Pedido registrado exitosamente!')
-      
-      // Limpiar formulario
-      setTimeout(() => {
-        setNombrePersona('')
-        setCelular('')
-        setIglesia('')
-        setCamisas([])
-        setMontoPago('')
-        setReferenciaPago('')
-        setFechaPago('')
-        setMensaje('')
-      }, 2000)
 
     } catch (error) {
       console.error('Error:', error)
@@ -205,15 +306,152 @@ function FormularioPedido() {
     }
   }
 
+  const cerrarModal = () => {
+    setMostrarModal(false)
+  }
+
+  const cerrarQR = () => {
+    setMostrarQR(false)
+    setPedidoCreado(null)
+    // Limpiar formulario
+    setNombrePersona('')
+    setCelular('')
+    setIglesia('')
+    setCamisas([])
+    setMontoPago('')
+    setReferenciaPago('')
+    setFechaPago('')
+    setMensaje('')
+  }
+
+  const descargarQR = () => {
+    const svg = document.getElementById('qr-code-svg')
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx.drawImage(img, 0, 0)
+      const pngFile = canvas.toDataURL('image/png')
+      
+      const downloadLink = document.createElement('a')
+      downloadLink.download = `pedido-${pedidoCreado.codigo_unico}.png`
+      downloadLink.href = pngFile
+      downloadLink.click()
+    }
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
+  }
+
+  // Si está en la pantalla inicial, mostrar opciones
+  if (mostrarPantallaInicial) {
+    return (
+      <div className="formulario-container">
+        <div className="pantalla-inicial-card">
+          <div className="pantalla-inicial-header">
+            <h2>👕 Bienvenido</h2>
+            <p>¿Qué deseas hacer?</p>
+          </div>
+
+          <div className="pantalla-inicial-opciones">
+            <div className="opcion-card">
+              <div className="opcion-icon">🆕</div>
+              <h3>Hacer un Nuevo Pedido</h3>
+              <p>Crea un pedido nuevo de camisas</p>
+              <button 
+                className="btn-opcion"
+                onClick={hacerNuevoPedido}
+              >
+                Comenzar Pedido
+              </button>
+            </div>
+
+            <div className="separador-o">O</div>
+
+            <div className="opcion-card">
+              <div className="opcion-icon">🔍</div>
+              <h3>Ver mi Pedido Existente</h3>
+              <p>Ingresa tu código único o escanea el QR</p>
+              
+              <div className="codigo-input-group">
+                <input
+                  type="text"
+                  className="codigo-input"
+                  placeholder="Ej: ABC12345"
+                  value={codigoIngresado}
+                  onChange={(e) => setCodigoIngresado(e.target.value.toUpperCase())}
+                  maxLength={8}
+                />
+                <button 
+                  className="btn-buscar-codigo"
+                  onClick={buscarPedidoPorCodigo}
+                  disabled={buscandoPedido}
+                >
+                  {buscandoPedido ? '⏳' : '🔍'} Buscar
+                </button>
+              </div>
+
+              <div className="separador-texto">O</div>
+
+              <button 
+                className="btn-escanear-qr"
+                onClick={abrirEscaner}
+              >
+                📷 Escanear QR con Cámara
+              </button>
+            </div>
+          </div>
+
+          <div className="info-footer">
+            <p>
+              <strong>¿No tienes un código?</strong> Haz un nuevo pedido y recibirás un código único y QR para gestionar tu pedido.
+            </p>
+          </div>
+        </div>
+
+        {/* Modal del Escáner de QR */}
+        {mostrarEscaner && (
+          <div className="modal-overlay" onClick={cerrarEscaner}>
+            <div className="modal-escaner" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-escaner-header">
+                <h3>📷 Escanea tu QR</h3>
+                <button className="btn-cerrar-escaner" onClick={cerrarEscaner}>✕</button>
+              </div>
+              <div className="modal-escaner-body">
+                <p className="escaner-instruccion">
+                  Coloca el QR de tu pedido frente a la cámara
+                </p>
+                <div id="qr-reader" className="escaner-container"></div>
+                <p className="escaner-ayuda">
+                  💡 Asegúrate de dar permisos de cámara a tu navegador
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="formulario-container">
       <div className="formulario-card">
         <div className="header-section">
+          <button 
+            className="btn-volver-inicio"
+            onClick={() => setMostrarPantallaInicial(true)}
+            type="button"
+          >
+            ← Volver
+          </button>
           <h2 className="formulario-title">Realizar Pedido</h2>
           <p className="formulario-subtitle">Selecciona tu camisa</p>
         </div>
         
-        <form onSubmit={handleSubmit} className="formulario">
+        <form onSubmit={abrirModalConfirmacion} className="formulario">
           {/* Botón para agregar camisas */}
           <div className="form-section">
             <div className="section-header">
@@ -575,6 +813,248 @@ function FormularioPedido() {
             </button>
           )}
         </form>
+
+        {/* Modal de Confirmación */}
+        {mostrarModal && (
+          <div className="modal-overlay" onClick={cerrarModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3 className="modal-title">📋 Confirmar Pedido</h3>
+                <button className="modal-close" onClick={cerrarModal}>✕</button>
+              </div>
+
+              <div className="modal-body">
+                {/* Información Personal */}
+                <div className="modal-section">
+                  <h4 className="modal-section-title">👤 Información Personal</h4>
+                  <div className="modal-info-grid">
+                    <div className="modal-info-item">
+                      <span className="modal-label">Nombre:</span>
+                      <span className="modal-value">{nombrePersona}</span>
+                    </div>
+                    <div className="modal-info-item">
+                      <span className="modal-label">Celular:</span>
+                      <span className="modal-value">{celular}</span>
+                    </div>
+                    <div className="modal-info-item">
+                      <span className="modal-label">Iglesia:</span>
+                      <span className="modal-value">{iglesia}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Camisas del Pedido */}
+                <div className="modal-section">
+                  <h4 className="modal-section-title">👕 Camisas del Pedido ({camisas.length})</h4>
+                  <div className="modal-camisas-lista">
+                    {camisas.map((camisa, index) => (
+                      <div key={camisa.id} className="modal-camisa-item">
+                        <div className="modal-camisa-header">
+                          <span className="modal-camisa-numero">Camisa #{camisas.length - index}</span>
+                          <span className="modal-camisa-tipo">
+                            {camisa.tipo === 'normal' && '👕 Normal'}
+                            {camisa.tipo === 'directiva_club' && '🎖️ Directiva Club'}
+                            {camisa.tipo === 'directiva_zona' && '👔 Directiva ZONA'}
+                          </span>
+                        </div>
+                        <div className="modal-camisa-detalles">
+                          <div className="modal-detalle-row">
+                            <span className="modal-detalle-label">Talla:</span>
+                            <span className="modal-detalle-value">{camisa.talla}</span>
+                          </div>
+                          {camisa.textoFrente && (
+                            <div className="modal-detalle-row">
+                              <span className="modal-detalle-label">Texto al frente:</span>
+                              <span className="modal-detalle-value">{camisa.textoFrente}</span>
+                            </div>
+                          )}
+                          {camisa.nombre && (
+                            <div className="modal-detalle-row">
+                              <span className="modal-detalle-label">Nombre detrás:</span>
+                              <span className="modal-detalle-value">{camisa.nombre}</span>
+                            </div>
+                          )}
+                          {camisa.tipo === 'directiva_club' && (
+                            <div className="modal-detalle-row">
+                              <span className="modal-detalle-label">Texto al frente:</span>
+                              <span className="modal-detalle-value">Director</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Totales */}
+                <div className="modal-section">
+                  <h4 className="modal-section-title">💰 Totales</h4>
+                  <div className="modal-totales">
+                    <div className="modal-total-row">
+                      <span className="modal-total-label">Total de camisas:</span>
+                      <span className="modal-total-value">{camisas.length}</span>
+                    </div>
+                    {(() => {
+                      const camisasConPrecio = camisas.filter(c => c.tipo !== 'directiva_zona')
+                      const totalDolares = calcularTotalPedido(camisasConPrecio)
+                      
+                      if (camisasConPrecio.length > 0) {
+                        return (
+                          <>
+                            <div className="modal-total-row">
+                              <span className="modal-total-label">Total en dólares:</span>
+                              <span className="modal-total-value destacado">${totalDolares}</span>
+                            </div>
+                            {dolarHoy && (
+                              <div className="modal-total-row">
+                                <span className="modal-total-label">Total en bolívares:</span>
+                                <span className="modal-total-value destacado-bs">
+                                  Bs. {formatearPrecio(totalDolares * dolarHoy.precio)}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )
+                      }
+                      return null
+                    })()}
+                  </div>
+                </div>
+
+                {/* Información de Pago (si existe) */}
+                {(montoPago || referenciaPago || fechaPago) && (
+                  <div className="modal-section">
+                    <h4 className="modal-section-title">💳 Información de Pago</h4>
+                    <div className="modal-info-grid">
+                      {montoPago && (
+                        <div className="modal-info-item">
+                          <span className="modal-label">Monto:</span>
+                          <span className="modal-value">{montoPago} Bs</span>
+                        </div>
+                      )}
+                      {referenciaPago && (
+                        <div className="modal-info-item">
+                          <span className="modal-label">Referencia:</span>
+                          <span className="modal-value">{referenciaPago}</span>
+                        </div>
+                      )}
+                      {fechaPago && (
+                        <div className="modal-info-item">
+                          <span className="modal-label">Fecha:</span>
+                          <span className="modal-value">{fechaPago}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn-modal-cancelar"
+                  onClick={cerrarModal}
+                  disabled={loading}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="button" 
+                  className="btn-modal-confirmar"
+                  onClick={confirmarPedido}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner"></span>
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      ✅ Confirmar Pedido
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de QR y Código Único */}
+        {mostrarQR && pedidoCreado && (
+          <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && cerrarQR()}>
+            <div className="modal-qr-content">
+              <div className="modal-qr-header">
+                <h3>✅ ¡Pedido Registrado Exitosamente!</h3>
+              </div>
+
+              <div className="modal-qr-body">
+                <div className="qr-importante">
+                  <h4>⚠️ IMPORTANTE - GUARDA ESTA INFORMACIÓN</h4>
+                  <p>Este código QR y el código único te permitirán:</p>
+                  <ul>
+                    <li>✅ Ver el resumen de tu pedido</li>
+                    <li>➕ Agregar más camisas si lo necesitas</li>
+                    <li>💳 Registrar los datos de pago</li>
+                  </ul>
+                  <p className="qr-advertencia">
+                    <strong>¡Guarda este QR o el código! Lo necesitarás para gestionar tu pedido.</strong>
+                  </p>
+                </div>
+
+                <div className="qr-code-section">
+                  <h4>📱 Escanea este QR</h4>
+                  <div className="qr-code-container">
+                    <QRCodeSVG 
+                      id="qr-code-svg"
+                      value={`${window.location.origin}/pedido/${pedidoCreado.codigo_unico}`}
+                      size={256}
+                      level="H"
+                      includeMargin={true}
+                    />
+                  </div>
+                  <button className="btn-descargar-qr" onClick={descargarQR}>
+                    📥 Descargar QR
+                  </button>
+                </div>
+
+                <div className="codigo-section">
+                  <h4>🔑 O usa este código único</h4>
+                  <div className="codigo-display">
+                    <span className="codigo-texto">{pedidoCreado.codigo_unico}</span>
+                    <button 
+                      className="btn-copiar-codigo"
+                      onClick={() => {
+                        navigator.clipboard.writeText(pedidoCreado.codigo_unico)
+                        alert('✅ Código copiado al portapapeles')
+                      }}
+                    >
+                      📋 Copiar
+                    </button>
+                  </div>
+                </div>
+
+                <div className="resumen-pedido-qr">
+                  <h4>📋 Resumen de tu Pedido</h4>
+                  <div className="resumen-info-qr">
+                    <p><strong>Nombre:</strong> {pedidoCreado.nombre_persona}</p>
+                    <p><strong>Iglesia:</strong> {pedidoCreado.iglesia}</p>
+                    <p><strong>Total de camisas:</strong> {pedidoCreado.total_camisas}</p>
+                    {pedidoCreado.camisas && pedidoCreado.camisas.length > 0 && (
+                      <p><strong>Total:</strong> ${calcularTotalPedido(pedidoCreado.camisas)}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-qr-footer">
+                <button className="btn-cerrar-qr" onClick={cerrarQR}>
+                  ✅ Entendido, Hacer Otro Pedido
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

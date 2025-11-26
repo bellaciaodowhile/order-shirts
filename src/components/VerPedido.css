@@ -1,0 +1,370 @@
+.ver-pedido-container {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.ver-pedido-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.pedido-header-ver {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pedido-header-ver h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.estado-badge {
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.estado-badge.pagado {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.estado-badge.pendiente {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: white;
+}
+
+.pedido-info-ver {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+}
+
+.info-row-ver {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.info-row-ver:last-child {
+  border-bottom: none;
+}
+
+.info-label-ver {
+  font-weight: 600;
+  color: #666;
+}
+
+.info-value-ver {
+  font-weight: 700;
+  color: #333;
+}
+
+.codigo-unico {
+  font-family: 'Courier New', monospace;
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+}
+
+.camisas-section-ver {
+  margin-bottom: 2rem;
+}
+
+.camisas-section-ver h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.camisas-lista-ver {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.camisa-item-ver {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  border-left: 4px solid #667eea;
+}
+
+.camisa-numero-ver {
+  background: #667eea;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.camisa-detalles-ver {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.camisa-tipo-ver {
+  font-weight: 700;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.camisa-talla-ver {
+  color: #666;
+  font-weight: 600;
+}
+
+.camisa-texto-ver {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.totales-ver {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+}
+
+.total-row-ver {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.total-row-ver.destacado-ver {
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.total-valor-ver,
+.total-valor-bs-ver {
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.pago-section-ver {
+  margin-bottom: 2rem;
+}
+
+.btn-registrar-pago {
+  width: 100%;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-registrar-pago:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.form-pago-ver {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 15px;
+}
+
+.form-pago-ver h3 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+}
+
+.form-group-ver {
+  margin-bottom: 1.25rem;
+}
+
+.form-group-ver label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.form-group-ver input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group-ver input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions-ver {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-cancelar-ver,
+.btn-confirmar-ver {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar-ver {
+  background: #e9ecef;
+  color: #666;
+}
+
+.btn-cancelar-ver:hover {
+  background: #dee2e6;
+}
+
+.btn-confirmar-ver {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.btn-confirmar-ver:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.pago-info-ver {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  border: 2px solid #28a745;
+}
+
+.pago-info-ver h3 {
+  margin: 0 0 1rem 0;
+  color: #155724;
+}
+
+.acciones-ver {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-volver,
+.btn-nuevo-pedido {
+  flex: 1;
+  min-width: 200px;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-volver {
+  background: #e9ecef;
+  color: #666;
+}
+
+.btn-volver:hover {
+  background: #dee2e6;
+  transform: translateY(-2px);
+}
+
+.btn-nuevo-pedido {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-nuevo-pedido:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.loading-pedido,
+.error-pedido {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.error-pedido h2 {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.error-pedido p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .ver-pedido-card {
+    padding: 1.5rem;
+  }
+
+  .pedido-header-ver {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pedido-header-ver h2 {
+    font-size: 1.5rem;
+  }
+
+  .acciones-ver {
+    flex-direction: column;
+  }
+
+  .btn-volver,
+  .btn-nuevo-pedido {
+    min-width: 100%;
+  }
+
+  .form-actions-ver {
+    flex-direction: column;
+  }
+}

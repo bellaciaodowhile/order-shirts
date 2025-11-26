@@ -8,10 +8,19 @@ function PanelAdmin() {
   const [pedidos, setPedidos] = useState([])
   const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState('todos')
+  const [filtroCamisa, setFiltroCamisa] = useState('todas')
   const [busqueda, setBusqueda] = useState('')
   const [fechaInicio, setFechaInicio] = useState('')
   const [fechaFin, setFechaFin] = useState('')
   const [dolarHoy, setDolarHoy] = useState(null)
+  const [mostrarModalPago, setMostrarModalPago] = useState(false)
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null)
+  const [montoPago, setMontoPago] = useState('')
+  const [referenciaPago, setReferenciaPago] = useState('')
+  const [fechaPago, setFechaPago] = useState('')
+  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false)
+  const [pedidoEditar, setPedidoEditar] = useState(null)
+  const [camisasEditadas, setCamisasEditadas] = useState([])
 
   useEffect(() => {
     cargarPedidos()
@@ -39,20 +48,88 @@ function PanelAdmin() {
     }
   }
 
-  const marcarComoPagado = async (id) => {
-    if (!confirm('¿Estás seguro de marcar este pedido como pagado?')) return
+  const abrirModalPago = (pedido) => {
+    setPedidoSeleccionado(pedido)
+    setMontoPago('')
+    setReferenciaPago('')
+    setFechaPago('')
+    setMostrarModalPago(true)
+  }
+
+  const cerrarModalPago = () => {
+    setMostrarModalPago(false)
+    setPedidoSeleccionado(null)
+    setMontoPago('')
+    setReferenciaPago('')
+    setFechaPago('')
+  }
+
+  const confirmarPago = async () => {
+    if (!montoPago || !referenciaPago || !fechaPago) {
+      alert('Por favor completa todos los campos del pago')
+      return
+    }
 
     try {
       const { error } = await supabase
         .from('pedidos')
-        .update({ pagado: true })
-        .eq('id', id)
+        .update({ 
+          pagado: true,
+          monto_pago: parseFloat(montoPago),
+          referencia_pago: referenciaPago,
+          fecha_pago: fechaPago
+        })
+        .eq('id', pedidoSeleccionado.id)
 
       if (error) throw error
+      
+      cerrarModalPago()
       cargarPedidos()
+      alert('✅ Pago registrado exitosamente')
     } catch (error) {
       console.error('Error:', error)
-      alert('Error al actualizar el pedido')
+      alert('❌ Error al registrar el pago: ' + error.message)
+    }
+  }
+
+  const abrirModalEdicion = (pedido) => {
+    setPedidoEditar(pedido)
+    setCamisasEditadas(JSON.parse(JSON.stringify(pedido.camisas))) // Copia profunda
+    setMostrarModalEdicion(true)
+  }
+
+  const cerrarModalEdicion = () => {
+    setMostrarModalEdicion(false)
+    setPedidoEditar(null)
+    setCamisasEditadas([])
+  }
+
+  const actualizarCamisaEditada = (index, campo, valor) => {
+    const nuevasCamisas = [...camisasEditadas]
+    nuevasCamisas[index] = {
+      ...nuevasCamisas[index],
+      [campo]: valor
+    }
+    setCamisasEditadas(nuevasCamisas)
+  }
+
+  const guardarEdicion = async () => {
+    try {
+      const { error } = await supabase
+        .from('pedidos')
+        .update({ 
+          camisas: camisasEditadas
+        })
+        .eq('id', pedidoEditar.id)
+
+      if (error) throw error
+      
+      cerrarModalEdicion()
+      cargarPedidos()
+      alert('✅ Pedido actualizado exitosamente')
+    } catch (error) {
+      console.error('Error:', error)
+      alert('❌ Error al actualizar el pedido: ' + error.message)
     }
   }
 
@@ -130,10 +207,20 @@ function PanelAdmin() {
       (filtro === 'pagados' && pedido.pagado) ||
       (filtro === 'pendientes' && !pedido.pagado)
 
-    const cumpleBusqueda = 
+    // Búsqueda en datos del pedido y en las camisas
+    let cumpleBusqueda = 
       pedido.nombre_persona.toLowerCase().includes(busqueda.toLowerCase()) ||
       pedido.iglesia.toLowerCase().includes(busqueda.toLowerCase()) ||
       pedido.celular.includes(busqueda)
+    
+    // Buscar también en los textos de las camisas (frente y detrás)
+    if (!cumpleBusqueda && busqueda && pedido.camisas && Array.isArray(pedido.camisas)) {
+      cumpleBusqueda = pedido.camisas.some(camisa => {
+        const nombreMatch = camisa.nombre && camisa.nombre.toLowerCase().includes(busqueda.toLowerCase())
+        const frenteMatch = camisa.texto_frente && camisa.texto_frente.toLowerCase().includes(busqueda.toLowerCase())
+        return nombreMatch || frenteMatch
+      })
+    }
 
     // Filtro por fecha
     let cumpleFecha = true
@@ -141,19 +228,32 @@ function PanelAdmin() {
       const fechaPedido = new Date(pedido.created_at)
       
       if (fechaInicio) {
-        const inicio = new Date(fechaInicio)
-        inicio.setHours(0, 0, 0, 0)
+        // Crear fecha en hora local para evitar problemas de zona horaria
+        const [year, month, day] = fechaInicio.split('-')
+        const inicio = new Date(year, month - 1, day, 0, 0, 0, 0)
         if (fechaPedido < inicio) cumpleFecha = false
       }
       
       if (fechaFin) {
-        const fin = new Date(fechaFin)
-        fin.setHours(23, 59, 59, 999)
+        // Crear fecha en hora local para evitar problemas de zona horaria
+        const [year, month, day] = fechaFin.split('-')
+        const fin = new Date(year, month - 1, day, 23, 59, 59, 999)
         if (fechaPedido > fin) cumpleFecha = false
       }
     }
 
-    return cumpleFiltro && cumpleBusqueda && cumpleFecha
+    // Filtro por tipo de camisa
+    let cumpleTipoCamisa = true
+    if (filtroCamisa !== 'todas') {
+      if (pedido.camisas && Array.isArray(pedido.camisas)) {
+        // Verificar si el pedido tiene al menos una camisa del tipo seleccionado
+        cumpleTipoCamisa = pedido.camisas.some(camisa => camisa.tipo === filtroCamisa)
+      } else {
+        cumpleTipoCamisa = false
+      }
+    }
+
+    return cumpleFiltro && cumpleBusqueda && cumpleFecha && cumpleTipoCamisa
   })
 
   // Calcular estadísticas detalladas
@@ -195,8 +295,8 @@ function PanelAdmin() {
     }, 0)
   }
 
-  // Calcular totales en dólares (solo pedidos pagados)
-  const totalDolaresPagados = pedidos
+  // Calcular total en dólares sumando el precio de las camisas de pedidos pagados
+  const totalDolaresPagados = pedidosFiltrados
     .filter(p => p.pagado)
     .reduce((sum, p) => {
       if (p.camisas && Array.isArray(p.camisas)) {
@@ -205,7 +305,12 @@ function PanelAdmin() {
       return sum
     }, 0)
 
-  const totalBolivaresPagados = dolarHoy ? totalDolaresPagados * dolarHoy.precio : 0
+  // Calcular total en bolívares sumando los montos pagados registrados
+  const totalBolivaresPagados = pedidosFiltrados
+    .filter(p => p.pagado && p.monto_pago)
+    .reduce((sum, p) => {
+      return sum + parseFloat(p.monto_pago)
+    }, 0)
 
   const exportarCamisasExcel = () => {
     // Recopilar todas las camisas de todos los pedidos
@@ -447,25 +552,60 @@ function PanelAdmin() {
             )}
           </div>
           
-          <div className="filtros">
-            <button 
-              className={`filtro-btn ${filtro === 'todos' ? 'active' : ''}`}
-              onClick={() => setFiltro('todos')}
-            >
-              Todos
-            </button>
-            <button 
-              className={`filtro-btn ${filtro === 'pagados' ? 'active' : ''}`}
-              onClick={() => setFiltro('pagados')}
-            >
-              Pagados
-            </button>
-            <button 
-              className={`filtro-btn ${filtro === 'pendientes' ? 'active' : ''}`}
-              onClick={() => setFiltro('pendientes')}
-            >
-              Pendientes
-            </button>
+          <div className="filtros-container">
+            <div className="filtros-group">
+              <label className="filtros-label">Estado de Pago:</label>
+              <div className="filtros">
+                <button 
+                  className={`filtro-btn ${filtro === 'todos' ? 'active' : ''}`}
+                  onClick={() => setFiltro('todos')}
+                >
+                  Todos
+                </button>
+                <button 
+                  className={`filtro-btn ${filtro === 'pagados' ? 'active' : ''}`}
+                  onClick={() => setFiltro('pagados')}
+                >
+                  Pagados
+                </button>
+                <button 
+                  className={`filtro-btn ${filtro === 'pendientes' ? 'active' : ''}`}
+                  onClick={() => setFiltro('pendientes')}
+                >
+                  Pendientes
+                </button>
+              </div>
+            </div>
+
+            <div className="filtros-group">
+              <label className="filtros-label">Tipo de Camisa:</label>
+              <div className="filtros">
+                <button 
+                  className={`filtro-btn tipo ${filtroCamisa === 'todas' ? 'active' : ''}`}
+                  onClick={() => setFiltroCamisa('todas')}
+                >
+                  Todas
+                </button>
+                <button 
+                  className={`filtro-btn tipo ${filtroCamisa === 'normal' ? 'active' : ''}`}
+                  onClick={() => setFiltroCamisa('normal')}
+                >
+                  👕 Normal
+                </button>
+                <button 
+                  className={`filtro-btn tipo ${filtroCamisa === 'directiva_club' ? 'active' : ''}`}
+                  onClick={() => setFiltroCamisa('directiva_club')}
+                >
+                  🎖️ Dir. Club
+                </button>
+                <button 
+                  className={`filtro-btn tipo ${filtroCamisa === 'directiva_zona' ? 'active' : ''}`}
+                  onClick={() => setFiltroCamisa('directiva_zona')}
+                >
+                  👔 Dir. ZONA
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="exportar-section">
@@ -506,7 +646,7 @@ function PanelAdmin() {
                   {!pedido.pagado && (
                     <button 
                       className="btn-accion btn-pagar"
-                      onClick={() => marcarComoPagado(pedido.id)}
+                      onClick={() => abrirModalPago(pedido)}
                       title="Marcar como pagado"
                     >
                       Marcar como pagado 💳
@@ -563,8 +703,15 @@ function PanelAdmin() {
                 </div>
 
                 {/* Lista de camisas */}
-                <div className="detalle-row">
+                <div className="detalle-row camisas-header-row">
                   <span className="detalle-label">👕 Camisas del pedido:</span>
+                  <button 
+                    className="btn-editar-camisas"
+                    onClick={() => abrirModalEdicion(pedido)}
+                    title="Editar camisas"
+                  >
+                    ✏️ Editar
+                  </button>
                 </div>
                 <div className="camisas-lista-admin">
                   {pedido.camisas && pedido.camisas.map((camisa, index) => {
@@ -607,10 +754,10 @@ function PanelAdmin() {
                       <span>💵 Total en dólares:</span>
                       <span className="total-valor">${calcularTotalPedido(pedido.camisas)}</span>
                     </div>
-                    {dolarHoy && (
-                      <div className="total-row destacado">
-                        <span>💰 Total en bolívares:</span>
-                        <span className="total-valor-bs">
+                    {dolarHoy && !pedido.pagado && (
+                      <div className="total-row destacado pendiente-pago">
+                        <span>💰 Total a pagar:</span>
+                        <span className="total-valor-bs pendiente">
                           Bs. {formatearPrecio(calcularTotalPedido(pedido.camisas) * dolarHoy.precio)}
                         </span>
                       </div>
@@ -646,6 +793,199 @@ function PanelAdmin() {
           ))
         )}
       </div>
+
+      {/* Modal de Edición de Camisas */}
+      {mostrarModalEdicion && pedidoEditar && (
+        <div className="modal-overlay" onClick={cerrarModalEdicion}>
+          <div className="modal-content-edicion" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-edicion">
+              <h3 className="modal-title-edicion">✏️ Editar Camisas</h3>
+              <button className="modal-close-edicion" onClick={cerrarModalEdicion}>✕</button>
+            </div>
+
+            <div className="modal-body-edicion">
+              <div className="info-pedido-edicion">
+                <h4>{pedidoEditar.nombre_persona} - {pedidoEditar.iglesia}</h4>
+              </div>
+
+              <div className="camisas-edicion-lista">
+                {camisasEditadas.map((camisa, index) => (
+                  <div key={index} className="camisa-edicion-item">
+                    <div className="camisa-edicion-header">
+                      <span className="camisa-numero-edicion">Camisa #{index + 1}</span>
+                      <span className="camisa-tipo-badge-edicion">
+                        {camisa.tipo === 'normal' && '👕 Normal'}
+                        {camisa.tipo === 'directiva_club' && '🎖️ Dir. Club'}
+                        {camisa.tipo === 'directiva_zona' && '👔 Dir. ZONA'}
+                      </span>
+                    </div>
+
+                    <div className="form-edicion-grid">
+                      <div className="form-group-edicion">
+                        <label className="form-label-edicion">Talla:</label>
+                        <select
+                          className="form-input-edicion"
+                          value={camisa.talla}
+                          onChange={(e) => actualizarCamisaEditada(index, 'talla', e.target.value)}
+                        >
+                          <option value="8">8</option>
+                          <option value="10">10</option>
+                          <option value="12">12</option>
+                          <option value="16">16</option>
+                          <option value="S">S</option>
+                          <option value="M">M</option>
+                          <option value="L">L</option>
+                          <option value="XL">XL</option>
+                          <option value="2XL">2XL</option>
+                        </select>
+                      </div>
+
+                      {camisa.tipo === 'directiva_zona' && (
+                        <>
+                          <div className="form-group-edicion">
+                            <label className="form-label-edicion">Texto al frente:</label>
+                            <input
+                              type="text"
+                              className="form-input-edicion"
+                              value={camisa.texto_frente || ''}
+                              onChange={(e) => actualizarCamisaEditada(index, 'texto_frente', e.target.value)}
+                              placeholder="Ej: Líder, Pastor"
+                            />
+                          </div>
+                          <div className="form-group-edicion">
+                            <label className="form-label-edicion">Nombre detrás:</label>
+                            <input
+                              type="text"
+                              className="form-input-edicion"
+                              value={camisa.nombre || ''}
+                              onChange={(e) => actualizarCamisaEditada(index, 'nombre', e.target.value)}
+                              placeholder="Ej: Juan Pérez"
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {camisa.tipo === 'directiva_club' && (
+                        <div className="form-group-edicion">
+                          <label className="form-label-edicion">Nombre detrás:</label>
+                          <input
+                            type="text"
+                            className="form-input-edicion"
+                            value={camisa.nombre || ''}
+                            onChange={(e) => actualizarCamisaEditada(index, 'nombre', e.target.value)}
+                            placeholder="Ej: Juan Pérez"
+                          />
+                          <small className="form-hint-edicion">Texto al frente: "Director"</small>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="modal-footer-edicion">
+              <button 
+                type="button" 
+                className="btn-modal-cancelar-edicion"
+                onClick={cerrarModalEdicion}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                className="btn-modal-confirmar-edicion"
+                onClick={guardarEdicion}
+              >
+                💾 Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Pago */}
+      {mostrarModalPago && pedidoSeleccionado && (
+        <div className="modal-overlay" onClick={cerrarModalPago}>
+          <div className="modal-content-pago" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-pago">
+              <h3 className="modal-title-pago">💳 Registrar Pago</h3>
+              <button className="modal-close-pago" onClick={cerrarModalPago}>✕</button>
+            </div>
+
+            <div className="modal-body-pago">
+              <div className="info-pedido-pago">
+                <h4>Pedido de: {pedidoSeleccionado.nombre_persona}</h4>
+                <p>Iglesia: {pedidoSeleccionado.iglesia}</p>
+                <p>Total de camisas: {pedidoSeleccionado.total_camisas}</p>
+                {pedidoSeleccionado.camisas && pedidoSeleccionado.camisas.length > 0 && (
+                  <p className="total-dolares-pago">
+                    Total: ${calcularTotalPedido(pedidoSeleccionado.camisas)}
+                    {dolarHoy && (
+                      <span className="total-bs-pago">
+                        {' '}≈ Bs. {formatearPrecio(calcularTotalPedido(pedidoSeleccionado.camisas) * dolarHoy.precio)}
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+
+              <div className="form-pago">
+                <div className="form-group-pago">
+                  <label className="form-label-pago">Monto Pagado (Bs) *</label>
+                  <input 
+                    type="number"
+                    step="0.01"
+                    className="form-input-pago"
+                    value={montoPago}
+                    onChange={(e) => setMontoPago(e.target.value)}
+                    placeholder="0.00"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="form-group-pago">
+                  <label className="form-label-pago">Referencia de Pago *</label>
+                  <input 
+                    type="text"
+                    className="form-input-pago"
+                    value={referenciaPago}
+                    onChange={(e) => setReferenciaPago(e.target.value)}
+                    placeholder="Últimos 4-6 dígitos"
+                  />
+                </div>
+
+                <div className="form-group-pago">
+                  <label className="form-label-pago">Fecha de Pago *</label>
+                  <input 
+                    type="date"
+                    className="form-input-pago"
+                    value={fechaPago}
+                    onChange={(e) => setFechaPago(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer-pago">
+              <button 
+                type="button" 
+                className="btn-modal-cancelar-pago"
+                onClick={cerrarModalPago}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                className="btn-modal-confirmar-pago"
+                onClick={confirmarPago}
+              >
+                ✅ Confirmar Pago
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
