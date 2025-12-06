@@ -461,13 +461,13 @@ function PanelAdmin() {
               className="tab-btn"
               onClick={() => setVistaActual('administracion')}
             >
-              📊 Administración
+              Administración
             </button>
             <button 
               className="tab-btn active"
               onClick={() => setVistaActual('entregas')}
             >
-              📦 Entregas
+              Entregas
             </button>
           </div>
         </div>
@@ -484,13 +484,13 @@ function PanelAdmin() {
             className="tab-btn active"
             onClick={() => setVistaActual('administracion')}
           >
-            📊 Administración
+            Administración
           </button>
           <button 
             className="tab-btn"
             onClick={() => setVistaActual('entregas')}
           >
-            📦 Entregas
+            Entregas
           </button>
         </div>
         <h2 className="panel-title">📊 Panel de Administración</h2>
