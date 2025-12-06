@@ -3,9 +3,11 @@ import { supabase } from '../supabaseClient'
 import * as XLSX from 'xlsx'
 import { obtenerDolarHoy, calcularTotalPedido, formatearPrecio } from '../utils/dolarApi'
 import { QRCodeSVG } from 'qrcode.react'
+import PanelEntregas from './PanelEntregas'
 import './PanelAdmin.css'
 
 function PanelAdmin() {
+  const [vistaActual, setVistaActual] = useState('administracion') // 'administracion' o 'entregas'
   const [pedidos, setPedidos] = useState([])
   const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState('todos')
@@ -433,9 +435,48 @@ function PanelAdmin() {
     )
   }
 
+  // Si está en vista de entregas, mostrar el componente de entregas
+  if (vistaActual === 'entregas') {
+    return (
+      <div className="panel-container">
+        <div className="panel-header">
+          <div className="tabs-navegacion">
+            <button 
+              className="tab-btn"
+              onClick={() => setVistaActual('administracion')}
+            >
+              📊 Administración
+            </button>
+            <button 
+              className="tab-btn active"
+              onClick={() => setVistaActual('entregas')}
+            >
+              📦 Entregas
+            </button>
+          </div>
+        </div>
+        <PanelEntregas />
+      </div>
+    )
+  }
+
   return (
     <div className="panel-container">
       <div className="panel-header">
+        <div className="tabs-navegacion">
+          <button 
+            className="tab-btn active"
+            onClick={() => setVistaActual('administracion')}
+          >
+            📊 Administración
+          </button>
+          <button 
+            className="tab-btn"
+            onClick={() => setVistaActual('entregas')}
+          >
+            📦 Entregas
+          </button>
+        </div>
         <h2 className="panel-title">📊 Panel de Administración</h2>
         
         {/* Totales Principales */}

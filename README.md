@@ -6,12 +6,15 @@ Sistema completo para gestionar pedidos de camisas con diferentes tipos (Directi
 
 - ✅ Formulario de pedidos con validación
 - ✅ Tres tipos de camisas con personalizaciones diferentes
-- ✅ Selección de tallas múltiples (8, 12, 16, S, M, L, XL, 2XL)
+- ✅ Selección de tallas múltiples (8, 10, 12, 16, S, M, L, XL, 2XL)
 - ✅ Gestión de pagos (opcional al momento del pedido)
-- ✅ Panel administrativo con estadísticas
-- ✅ Filtros y búsqueda de pedidos
+- ✅ Panel administrativo con estadísticas detalladas
+- ✅ **Panel de entregas con seguimiento individual de camisas**
+- ✅ Filtros y búsqueda avanzada de pedidos
+- ✅ Exportación a Excel (detalle y resumen)
+- ✅ Códigos QR para cada pedido
 - ✅ Diseño responsive y moderno
-- ✅ Indicadores de estado de pago
+- ✅ Indicadores de estado de pago y entrega
 
 ## 📋 Requisitos Previos
 
@@ -106,14 +109,37 @@ npm run dev
 
 5. Haz clic en "Registrar Pedido"
 
-### Panel Administrativo
+### Panel Administrativo (Ruta: `/admin`)
 
-- Ver todos los pedidos
-- Filtrar por estado (Todos, Pagados, Pendientes)
-- Buscar por nombre, iglesia o celular
-- Marcar pedidos como pagados
+El panel administrativo incluye dos pestañas integradas:
+
+#### 📊 Pestaña Administración
+- Ver todos los pedidos con detalles completos
+- Filtrar por estado de pago (Todos, Pagados, Pendientes)
+- Filtrar por tipo de camisa
+- Buscar por nombre, iglesia, celular o texto en camisas
+- Filtrar por rango de fechas
+- Marcar pedidos como pagados con referencia
+- Editar camisas de pedidos existentes
 - Eliminar pedidos
-- Ver estadísticas generales
+- Ver estadísticas detalladas (pedidos, camisas, tipos)
+- Exportar a Excel (detalle completo y resumen por tallas)
+- Generar y descargar códigos QR
+- Enviar confirmación de pago por WhatsApp
+- Ver totales en dólares y bolívares
+
+#### 📦 Pestaña Entregas
+- **Seguimiento individual de cada camisa**
+- Filtros por estado (Pendientes, Entregadas, Todos)
+- Filtros por tipo de camisa y talla
+- Búsqueda por nombre, código único o iglesia
+- Marcar camisas individuales como entregadas
+- Marcar múltiples camisas como entregadas
+- Desmarcar entregas (revertir)
+- Ver resumen por tallas con estadísticas
+- Exportar reporte de entregas a Excel
+- Ver pedido completo desde cada camisa
+- Estadísticas en tiempo real (total, entregadas, pendientes)
 
 ## 🎨 Personalización
 
@@ -146,6 +172,49 @@ npm run build
 ```
 
 Los archivos optimizados estarán en la carpeta `dist/`
+
+## 📦 Sistema de Entregas
+
+El sistema incluye un módulo completo para gestionar la entrega de camisas:
+
+### Configuración Inicial
+
+1. Ejecuta el script SQL `AGREGAR_SISTEMA_ENTREGA.sql` en Supabase
+2. Esto creará:
+   - Tabla `entregas_camisas` para seguimiento individual
+   - Triggers automáticos para sincronizar entregas
+   - Índices para búsquedas rápidas
+
+### Funcionalidades del Panel de Entregas
+
+**Gestión Individual:**
+- Cada camisa de cada pedido se registra individualmente
+- Permite marcar entregas una por una
+- Registra quién entregó y cuándo
+- Permite desmarcar entregas si hay errores
+
+**Filtros Avanzados:**
+- Por estado: Pendientes, Entregadas, Todos
+- Por tipo de camisa: Normal, Directiva Club, Directiva ZONA
+- Por talla: Todas las tallas disponibles
+- Búsqueda por nombre, código único o iglesia
+
+**Acciones Masivas:**
+- Marcar todas las camisas filtradas como entregadas
+- Útil para entregas grupales
+
+**Reportes:**
+- Resumen visual por tallas con estadísticas
+- Exportación a Excel con todos los detalles
+- Estadísticas en tiempo real
+
+### Flujo de Trabajo Recomendado
+
+1. **Recepción del Pedido**: Se crea en el formulario
+2. **Confirmación de Pago**: Se marca en el panel administrativo
+3. **Preparación**: Se revisan las camisas en el panel de entregas
+4. **Entrega**: Se marcan como entregadas individualmente o en grupo
+5. **Seguimiento**: Se puede ver el historial completo
 
 ## 🔒 Seguridad
 

@@ -1,0 +1,1827 @@
+.panel-entregas-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.panel-entregas-header {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.panel-entregas-header h2 {
+  color: #333;
+  font-size: 2rem;
+  margin: 0 0 2rem 0;
+}
+
+.stats-section {
+  margin-bottom: 2rem;
+}
+
+.stats-section-title {
+  color: #333;
+  font-size: 1.2rem;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.stats-entregas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.stat-entrega {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+  border: 2px solid #dee2e6;
+}
+
+.stat-entrega.success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-color: #28a745;
+}
+
+.stat-entrega.warning {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-color: #ffc107;
+}
+
+.stat-numero {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 1rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.filtros-entregas {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.busqueda-entregas {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.busqueda-entregas:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filtro-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filtro-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.resumen-tallas-entregas {
+  background: white;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.resumen-accordion-header {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resumen-accordion-header:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+.resumen-accordion-titulo {
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.resumen-accordion-icon {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+}
+
+.resumen-tallas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 2rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resumen-talla-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.resumen-talla-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.resumen-talla-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.resumen-tipo {
+  font-size: 1.5rem;
+}
+
+.resumen-talla-valor {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.resumen-talla-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resumen-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 8px;
+}
+
+.resumen-stat.success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+}
+
+.resumen-stat.warning {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.resumen-stat-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.resumen-stat-numero {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Lista de Pedidos */
+.pedidos-entregas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.no-pedidos {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Tarjeta de Pedido */
+.pedido-entrega-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 3px solid #e9ecef;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.pedido-entrega-card.completo {
+  border-color: #28a745;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+}
+
+.pedido-entrega-card.parcial {
+  border-color: #ffc107;
+}
+
+.pedido-entrega-card.pendiente {
+  border-color: #e9ecef;
+}
+
+.pedido-entrega-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Header del Pedido */
+.pedido-entrega-header {
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 2px solid #dee2e6;
+  transition: background 0.3s ease;
+}
+
+.pedido-entrega-header:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.pedido-info-principal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pedido-nombre-iglesia h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.pedido-iglesia {
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.pedido-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.badge-codigo {
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 12px;
+}
+
+.pedido-stats-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pedido-progreso {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #667eea;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+.badge-estado-pedido {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-estado-pedido.completo {
+  background: #28a745;
+  color: white;
+}
+
+.badge-estado-pedido.pendiente {
+  background: #ffc107;
+  color: white;
+}
+
+.icono-expandir {
+  font-size: 1.2rem;
+  color: #667eea;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+}
+
+/* Lista de Camisas con Checkboxes */
+.pedido-camisas-lista {
+  padding: 1.5rem;
+  background: white;
+  animation: slideDown 0.3s ease;
+}
+
+.camisa-item-checkbox {
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.camisa-item-checkbox:hover {
+  border-color: #667eea;
+  background: #f8f9fa;
+}
+
+.camisa-item-checkbox.entregada {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-color: #28a745;
+}
+
+.camisa-item-checkbox.seleccionada {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-color: #ffc107;
+}
+
+.camisa-checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.camisa-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkbox-custom {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #667eea;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.camisa-checkbox:checked + .checkbox-custom {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-color: #28a745;
+}
+
+.camisa-checkbox:checked + .checkbox-custom::after {
+  content: '✓';
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camisa-info-checkbox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.camisa-numero {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.camisa-detalles-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.camisa-tipo-icon {
+  font-size: 1.2rem;
+}
+
+.camisa-talla-badge {
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.camisa-nombre-text,
+.camisa-texto-text {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.camisa-fecha-entrega {
+  color: #28a745;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pedido-acciones-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.btn-ver-pedido-completo-inline {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-ver-pedido-completo-inline:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-confirmar-entregas {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
+.btn-confirmar-entregas:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
+.camisa-entregada-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.btn-deshacer-mini {
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-deshacer-mini:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Modal de Confirmación de Entregas */
+.modal-overlay-confirmacion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content-confirmacion {
+  background: white;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-header-confirmacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.modal-title-confirmacion {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-close-confirmacion {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-close-confirmacion:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-body-confirmacion {
+  padding: 2rem;
+}
+
+.info-pedido-confirmacion {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.info-pedido-confirmacion h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.info-pedido-confirmacion p {
+  margin: 0;
+  color: #666;
+}
+
+.camisas-confirmacion-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-title-confirmacion {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.section-title-confirmacion.warning {
+  color: #ffc107;
+}
+
+.camisas-lista-confirmacion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.camisa-confirmacion-item {
+  padding: 0.75rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.camisa-confirmacion-item.success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 2px solid #28a745;
+  color: #155724;
+}
+
+.camisa-confirmacion-item.warning {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 2px solid #ffc107;
+  color: #856404;
+}
+
+.camisa-icon {
+  font-size: 1.2rem;
+}
+
+.modal-footer-confirmacion {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-cancelar-confirmacion {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar-confirmacion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+}
+
+.btn-confirmar-entrega {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirmar-entrega:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* Modal de Deshacer Entrega */
+.modal-overlay-deshacer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1002;
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content-deshacer {
+  background: white;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-header-deshacer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.modal-title-deshacer {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-close-deshacer {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-close-deshacer:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-body-deshacer {
+  padding: 2rem;
+  text-align: center;
+}
+
+.icono-advertencia {
+  margin-bottom: 1rem;
+}
+
+.icono-warning {
+  font-size: 4rem;
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.texto-advertencia {
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.info-camisa-deshacer {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.info-camisa-deshacer p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.nota-seguridad {
+  font-size: 0.9rem;
+  color: #dc3545;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.modal-footer-deshacer {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-cancelar-deshacer {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar-deshacer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+}
+
+.btn-confirmar-deshacer {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirmar-deshacer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+}
+
+.camisa-entrega-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 3px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.camisa-entrega-card.entregada {
+  border-color: #28a745;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+}
+
+.camisa-entrega-card.pendiente {
+  border-color: #ffc107;
+}
+
+.camisa-entrega-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.camisa-entrega-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.camisa-entrega-info h3 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.camisa-iglesia {
+  color: #666;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.badges-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.camisa-codigo-unico {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 12px;
+}
+
+.badge-pago {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 12px;
+}
+
+.badge-pago.pagado {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.badge-pago.no-pagado {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: white;
+}
+
+.badge-entrega {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-entrega.entregada {
+  background: #28a745;
+  color: white;
+}
+
+.badge-entrega.pendiente {
+  background: #ffc107;
+  color: white;
+}
+
+.camisa-entrega-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.detalle-camisa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detalle-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.detalle-valor {
+  font-weight: 700;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.detalle-valor.talla {
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.camisa-entrega-acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-entregado-por {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.input-entregado-por:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.btn-marcar-entregada {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-marcar-entregada:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
+.btn-marcar-entregada-full {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-marcar-entregada-full:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.camisa-entrega-info-entrega {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid #28a745;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.info-entrega-detalles {
+  flex: 1;
+}
+
+.camisa-entrega-info-entrega p {
+  margin: 0.25rem 0;
+  color: #155724;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.btn-desmarcar-entrega {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-desmarcar-entrega:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.acciones-entregas-container {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-accion-masiva {
+  flex: 1;
+  min-width: 250px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-accion-masiva:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-exportar-entregas {
+  flex: 1;
+  min-width: 250px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-exportar-entregas:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-exportar-entregas:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.camisa-entrega-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-ver-pedido-completo {
+  display: block;
+  text-align: center;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-ver-pedido-completo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-reiniciar-filtros {
+  flex: 1;
+  min-width: 250px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-reiniciar-filtros:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+}
+
+.btn-reiniciar-filtros:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Modal de Pedido Completo */
+.modal-overlay-pedido {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content-pedido {
+  background: white;
+  border-radius: 20px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header-pedido {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.modal-title-pedido {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-close-pedido {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-pedido:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-body-pedido {
+  padding: 2rem;
+}
+
+.loading-pedido,
+.error-pedido {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.info-pedido-modal {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-row-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.info-row-modal:last-child {
+  border-bottom: none;
+}
+
+.info-label-modal {
+  font-weight: 700;
+  color: #666;
+  font-size: 1rem;
+}
+
+.info-valor-modal {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.codigo-unico-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.badge-modal {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.badge-modal.pagado {
+  background: #28a745;
+  color: white;
+}
+
+.badge-modal.pendiente {
+  background: #ffc107;
+  color: white;
+}
+
+.camisas-pedido-modal {
+  margin-bottom: 1.5rem;
+}
+
+.camisas-titulo-modal {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #667eea;
+}
+
+.camisa-item-modal {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.camisa-item-modal:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.camisa-numero-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.camisa-detalles-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detalle-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.detalle-label-modal {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.detalle-valor-modal {
+  font-weight: 700;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.talla-modal {
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+}
+
+.totales-pedido-modal {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 2px solid #28a745;
+}
+
+.total-row-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #155724;
+}
+
+.total-valor-modal {
+  font-size: 1.3rem;
+}
+
+.modal-footer-pedido {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.btn-compartir-pedido {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-compartir-pedido:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cerrar-modal-pedido {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cerrar-modal-pedido:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+}
+
+/* Modal de Confirmación de Entrega */
+.modal-overlay-confirmacion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content-confirmacion {
+  background: white;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-header-confirmacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.modal-title-confirmacion {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-close-confirmacion {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-confirmacion:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-body-confirmacion {
+  padding: 2rem;
+  text-align: center;
+}
+
+.icono-confirmacion {
+  margin-bottom: 1.5rem;
+}
+
+.icono-entrega {
+  font-size: 4rem;
+  animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.texto-confirmacion {
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.info-confirmacion {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-row-confirmacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.info-label-confirmacion {
+  font-weight: 700;
+  color: #666;
+  font-size: 1rem;
+}
+
+.info-valor-confirmacion {
+  font-weight: 700;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.nota-confirmacion {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+  margin: 0;
+}
+
+.modal-footer-confirmacion {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-cancelar-confirmacion {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar-confirmacion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+}
+
+.btn-confirmar-entrega {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirmar-entrega:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.loading,
+.no-camisas {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .panel-entregas-container {
+    padding: 1rem;
+  }
+
+  .filtros-entregas {
+    grid-template-columns: 1fr;
+  }
+
+  .camisas-entregas-lista {
+    grid-template-columns: 1fr;
+  }
+
+  .camisa-entrega-acciones {
+    flex-direction: column;
+  }
+
+  .btn-marcar-entregada {
+    width: 100%;
+  }
+
+  .modal-content-pedido {
+    max-height: 95vh;
+    margin: 0.5rem;
+  }
+
+  .modal-header-pedido {
+    padding: 1rem;
+  }
+
+  .modal-title-pedido {
+    font-size: 1.2rem;
+  }
+
+  .modal-body-pedido {
+    padding: 1rem;
+  }
+
+  .info-row-modal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .detalle-modal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .acciones-entregas-container {
+    flex-direction: column;
+  }
+
+  .btn-accion-masiva,
+  .btn-exportar-entregas {
+    min-width: 100%;
+  }
+
+  .modal-content-confirmacion {
+    margin: 0.5rem;
+  }
+
+  .modal-header-confirmacion {
+    padding: 1rem;
+  }
+
+  .modal-title-confirmacion {
+    font-size: 1.2rem;
+  }
+
+  .modal-body-confirmacion {
+    padding: 1.5rem;
+  }
+
+  .icono-entrega {
+    font-size: 3rem;
+  }
+
+  .texto-confirmacion {
+    font-size: 1rem;
+  }
+
+  .modal-footer-confirmacion {
+    flex-direction: column;
+  }
+
+  .btn-cancelar-confirmacion,
+  .btn-confirmar-entrega {
+    width: 100%;
+  }
+
+  .modal-footer-pedido {
+    flex-direction: column;
+  }
+
+  .btn-compartir-pedido,
+  .btn-cerrar-modal-pedido {
+    width: 100%;
+  }
+
+  .pedido-entrega-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pedido-stats-header {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .camisa-detalles-inline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Estados del Modal de Confirmación */
+.estado-procesando,
+.estado-exitoso {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.texto-procesando {
+  font-size: 1.2rem;
+  color: #666;
+  font-weight: 600;
+  margin: 0;
+}
+
+.icono-exito {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.titulo-exito {
+  color: #28a745;
+  font-size: 1.8rem;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+
+.texto-exito {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 600;
+}
