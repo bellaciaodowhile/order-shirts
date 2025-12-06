@@ -361,7 +361,7 @@ function PanelEntregas({ standalone = false }) {
   return (
     <ContenedorPrincipal {...propsContenedor}>
       <div className="panel-entregas-header">
-        <h2>📦 Panel de Entregas</h2>
+        <h2>Panel de Entregas</h2>
         
         {/* Estadísticas de Camisas */}
         <div className="stats-section">
