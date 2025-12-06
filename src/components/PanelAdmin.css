@@ -606,6 +606,11 @@
 .estadisticas-section {
   margin-bottom: 2rem;
 }
+.estadisticas-section .stat-label {
+  color: white;
+  font-weight: 800;
+  font-size: 20px;
+}
 
 .stats-title {
   margin: 0 0 1rem 0;
