@@ -9,7 +9,7 @@ function PanelEntregas({ standalone = false }) {
   const [busqueda, setBusqueda] = useState('')
   const [filtroTalla, setFiltroTalla] = useState('todas')
   const [filtroTipo, setFiltroTipo] = useState('todos')
-  const [filtroEstado, setFiltroEstado] = useState('pendientes')
+  const [filtroEstado, setFiltroEstado] = useState('todos')
   const [mostrarModalPedido, setMostrarModalPedido] = useState(false)
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null)
   const [loadingPedido, setLoadingPedido] = useState(false)
@@ -28,6 +28,7 @@ function PanelEntregas({ standalone = false }) {
   const [mostrarModalDeshacerPedido, setMostrarModalDeshacerPedido] = useState(false)
   const [pedidoADeshacer, setPedidoADeshacer] = useState(null)
   const [filtroPago, setFiltroPago] = useState('todos')
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false)
 
   useEffect(() => {
     cargarCamisas()
@@ -256,7 +257,7 @@ function PanelEntregas({ standalone = false }) {
     setBusqueda('')
     setFiltroTalla('todas')
     setFiltroTipo('todos')
-    setFiltroEstado('pendientes')
+    setFiltroEstado('todos')
     setFiltroPago('todos')
   }
 
@@ -481,8 +482,8 @@ function PanelEntregas({ standalone = false }) {
           </div>
         </div>
 
-        {/* Filtros */}
-        <div className="filtros-entregas">
+        {/* Barra de búsqueda y botón de filtros */}
+        <div className="barra-busqueda-filtros">
           <input
             type="text"
             className="busqueda-entregas"
@@ -490,62 +491,74 @@ function PanelEntregas({ standalone = false }) {
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
           />
-
-          <select
-            className="filtro-select"
-            value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}
+          <button 
+            className={`btn-toggle-filtros ${filtrosAbiertos ? 'activo' : ''}`}
+            onClick={() => setFiltrosAbiertos(!filtrosAbiertos)}
+            title="Filtros"
           >
-            <option value="todos">Todos</option>
-            <option value="pendientes">Pendientes</option>
-            <option value="entregadas">Entregadas</option>
-          </select>
-
-          <select
-            className="filtro-select"
-            value={filtroPago}
-            onChange={(e) => setFiltroPago(e.target.value)}
-          >
-            <option value="todos">Todos los pagos</option>
-            <option value="pagadas">💳 Pagadas</option>
-            <option value="no_pagadas">💰 No Pagadas</option>
-          </select>
-
-          <select
-            className="filtro-select"
-            value={filtroTipo}
-            onChange={(e) => setFiltroTipo(e.target.value)}
-          >
-            <option value="todos">Todos los tipos</option>
-            <option value="normal">👕 Normal</option>
-            <option value="directiva_club">🎖️ Dir. Club</option>
-            <option value="directiva_zona">👔 Dir. ZONA</option>
-          </select>
-
-          <select
-            className="filtro-select"
-            value={filtroTalla}
-            onChange={(e) => setFiltroTalla(e.target.value)}
-          >
-            <option value="todas">Todas las tallas</option>
-            <option value="8">8</option>
-            <option value="10">10</option>
-            <option value="12">12</option>
-            <option value="16">16</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="2XL">2XL</option>
-          </select>
+            🔍 Filtros {filtrosAbiertos ? '▼' : '▶'}
+          </button>
         </div>
+
+        {/* Filtros colapsables */}
+        {filtrosAbiertos && (
+          <div className="filtros-entregas-colapsables">
+            <select
+              className="filtro-select"
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+            >
+              <option value="todos">Todos</option>
+              <option value="pendientes">Pendientes</option>
+              <option value="entregadas">Entregadas</option>
+            </select>
+
+            <select
+              className="filtro-select"
+              value={filtroPago}
+              onChange={(e) => setFiltroPago(e.target.value)}
+            >
+              <option value="todos">Todos los pagos</option>
+              <option value="pagadas">💳 Pagadas</option>
+              <option value="no_pagadas">💰 No Pagadas</option>
+            </select>
+
+            <select
+              className="filtro-select"
+              value={filtroTipo}
+              onChange={(e) => setFiltroTipo(e.target.value)}
+            >
+              <option value="todos">Todos los tipos</option>
+              <option value="normal">👕 Normal</option>
+              <option value="directiva_club">🎖️ Dir. Club</option>
+              <option value="directiva_zona">👔 Dir. ZONA</option>
+            </select>
+
+            <select
+              className="filtro-select"
+              value={filtroTalla}
+              onChange={(e) => setFiltroTalla(e.target.value)}
+            >
+              <option value="todas">Todas las tallas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="12">12</option>
+              <option value="16">16</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="2XL">2XL</option>
+            </select>
+          </div>
+        )}
 
         {/* Acciones de filtros */}
         <div className="acciones-entregas-container">
           <button 
             className="btn-reiniciar-filtros"
             onClick={reiniciarFiltros}
-            disabled={!busqueda && filtroTalla === 'todas' && filtroTipo === 'todos' && filtroEstado === 'pendientes' && filtroPago === 'todos'}
+            disabled={!busqueda && filtroTalla === 'todas' && filtroTipo === 'todos' && filtroEstado === 'todos' && filtroPago === 'todos'}
           >
             🔄 Reiniciar Filtros
           </button>

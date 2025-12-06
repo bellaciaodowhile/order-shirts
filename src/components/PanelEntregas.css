@@ -70,13 +70,15 @@
   font-weight: 600;
 }
 
-.filtros-entregas {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+/* Barra de búsqueda y botón de filtros */
+.barra-busqueda-filtros {
+  display: flex;
   gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .busqueda-entregas {
+  flex: 1;
   padding: 0.75rem 1rem;
   border: 2px solid #e0e0e0;
   border-radius: 12px;
@@ -88,6 +90,43 @@
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-toggle-filtros {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-toggle-filtros:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-toggle-filtros.activo {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+/* Filtros colapsables */
+.filtros-entregas-colapsables {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  animation: slideDown 0.3s ease;
 }
 
 .filtro-select {
@@ -337,7 +376,7 @@
   font-weight: 700;
   color: #667eea;
   background: white;
-  padding: 0.5rem 1rem;
+  padding: 5px 8px;
   border-radius: 20px;
 }
 
@@ -1647,7 +1686,16 @@
     padding: 1rem;
   }
 
-  .filtros-entregas {
+  .barra-busqueda-filtros {
+    flex-direction: column;
+  }
+
+  .btn-toggle-filtros {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filtros-entregas-colapsables {
     grid-template-columns: 1fr;
   }
 

@@ -25,10 +25,13 @@ function PanelAdmin() {
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false)
   const [pedidoEditar, setPedidoEditar] = useState(null)
   const [camisasEditadas, setCamisasEditadas] = useState([])
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false)
+  const [entregasCamisas, setEntregasCamisas] = useState([])
 
   useEffect(() => {
     cargarPedidos()
     cargarDolar()
+    cargarEntregasCamisas()
   }, [])
 
   const cargarDolar = async () => {
@@ -56,6 +59,19 @@ function PanelAdmin() {
       console.error('Error al cargar pedidos:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const cargarEntregasCamisas = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('entregas_camisas')
+        .select('*')
+
+      if (error) throw error
+      setEntregasCamisas(data || [])
+    } catch (error) {
+      console.error('Error al cargar entregas:', error)
     }
   }
 
@@ -561,102 +577,117 @@ function PanelAdmin() {
         </div>
 
         <div className="controles">
-          <input 
-            type="text"
-            className="busqueda-input"
-            placeholder="🔍 Buscar por nombre, iglesia o celular..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-
-          {/* Filtros por fecha */}
-          <div className="filtros-fecha">
-            <div className="fecha-input-group">
-              <label className="fecha-label">📅 Desde:</label>
-              <input 
-                type="date"
-                className="fecha-input"
-                value={fechaInicio}
-                onChange={(e) => setFechaInicio(e.target.value)}
-              />
-            </div>
-            <div className="fecha-input-group">
-              <label className="fecha-label">📅 Hasta:</label>
-              <input 
-                type="date"
-                className="fecha-input"
-                value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
-              />
-            </div>
-            {(fechaInicio || fechaFin) && (
-              <button 
-                className="btn-limpiar-fechas"
-                onClick={() => {
-                  setFechaInicio('')
-                  setFechaFin('')
-                }}
-              >
-                🗑️ Limpiar
-              </button>
-            )}
+          {/* Barra de búsqueda y botón de filtros */}
+          <div className="barra-busqueda-filtros">
+            <input 
+              type="text"
+              className="busqueda-input"
+              placeholder="🔍 Buscar por nombre, iglesia o celular..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+            <button 
+              className={`btn-toggle-filtros ${filtrosAbiertos ? 'activo' : ''}`}
+              onClick={() => setFiltrosAbiertos(!filtrosAbiertos)}
+              title="Filtros"
+            >
+              🔍 Filtros {filtrosAbiertos ? '▼' : '▶'}
+            </button>
           </div>
-          
-          <div className="filtros-container">
-            <div className="filtros-group">
-              <label className="filtros-label">Estado de Pago:</label>
-              <div className="filtros">
-                <button 
-                  className={`filtro-btn ${filtro === 'todos' ? 'active' : ''}`}
-                  onClick={() => setFiltro('todos')}
-                >
-                  Todos
-                </button>
-                <button 
-                  className={`filtro-btn ${filtro === 'pagados' ? 'active' : ''}`}
-                  onClick={() => setFiltro('pagados')}
-                >
-                  Pagados
-                </button>
-                <button 
-                  className={`filtro-btn ${filtro === 'pendientes' ? 'active' : ''}`}
-                  onClick={() => setFiltro('pendientes')}
-                >
-                  Pendientes
-                </button>
+
+          {/* Filtros colapsables */}
+          {filtrosAbiertos && (
+            <div className="filtros-admin-colapsables">
+              {/* Filtros por fecha */}
+              <div className="filtros-fecha">
+                <div className="fecha-input-group">
+                  <label className="fecha-label">📅 Desde:</label>
+                  <input 
+                    type="date"
+                    className="fecha-input"
+                    value={fechaInicio}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                  />
+                </div>
+                <div className="fecha-input-group">
+                  <label className="fecha-label">📅 Hasta:</label>
+                  <input 
+                    type="date"
+                    className="fecha-input"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                  />
+                </div>
+                {(fechaInicio || fechaFin) && (
+                  <button 
+                    className="btn-limpiar-fechas"
+                    onClick={() => {
+                      setFechaInicio('')
+                      setFechaFin('')
+                    }}
+                  >
+                    🗑️ Limpiar
+                  </button>
+                )}
+              </div>
+              
+              <div className="filtros-container">
+                <div className="filtros-group">
+                  <label className="filtros-label">Estado de Pago:</label>
+                  <div className="filtros">
+                    <button 
+                      className={`filtro-btn ${filtro === 'todos' ? 'active' : ''}`}
+                      onClick={() => setFiltro('todos')}
+                    >
+                      Todos
+                    </button>
+                    <button 
+                      className={`filtro-btn ${filtro === 'pagados' ? 'active' : ''}`}
+                      onClick={() => setFiltro('pagados')}
+                    >
+                      Pagados
+                    </button>
+                    <button 
+                      className={`filtro-btn ${filtro === 'pendientes' ? 'active' : ''}`}
+                      onClick={() => setFiltro('pendientes')}
+                    >
+                      Pendientes
+                    </button>
+                  </div>
+                </div>
+
+                <div className="filtros-group">
+                  <label className="filtros-label">Tipo de Camisa:</label>
+                  <div className="filtros">
+                    <button 
+                      className={`filtro-btn tipo ${filtroCamisa === 'todas' ? 'active' : ''}`}
+                      onClick={() => setFiltroCamisa('todas')}
+                    >
+                      Todas
+                    </button>
+                    <button 
+                      className={`filtro-btn tipo ${filtroCamisa === 'normal' ? 'active' : ''}`}
+                      onClick={() => setFiltroCamisa('normal')}
+                    >
+                      👕 Normal
+                    </button>
+                    <button 
+                      className={`filtro-btn tipo ${filtroCamisa === 'directiva_club' ? 'active' : ''}`}
+                      onClick={() => setFiltroCamisa('directiva_club')}
+                    >
+                      🎖️ Dir. Club
+                    </button>
+                    <button 
+                      className={`filtro-btn tipo ${filtroCamisa === 'directiva_zona' ? 'active' : ''}`}
+                      onClick={() => setFiltroCamisa('directiva_zona')}
+                    >
+                      👔 Dir. ZONA
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className="filtros-group">
-              <label className="filtros-label">Tipo de Camisa:</label>
-              <div className="filtros">
-                <button 
-                  className={`filtro-btn tipo ${filtroCamisa === 'todas' ? 'active' : ''}`}
-                  onClick={() => setFiltroCamisa('todas')}
-                >
-                  Todas
-                </button>
-                <button 
-                  className={`filtro-btn tipo ${filtroCamisa === 'normal' ? 'active' : ''}`}
-                  onClick={() => setFiltroCamisa('normal')}
-                >
-                  👕 Normal
-                </button>
-                <button 
-                  className={`filtro-btn tipo ${filtroCamisa === 'directiva_club' ? 'active' : ''}`}
-                  onClick={() => setFiltroCamisa('directiva_club')}
-                >
-                  🎖️ Dir. Club
-                </button>
-                <button 
-                  className={`filtro-btn tipo ${filtroCamisa === 'directiva_zona' ? 'active' : ''}`}
-                  onClick={() => setFiltroCamisa('directiva_zona')}
-                >
-                  👔 Dir. ZONA
-                </button>
-              </div>
-            </div>
-          </div>
+          )}
 
           <div className="exportar-section">
             <button 
@@ -852,17 +883,33 @@ function PanelAdmin() {
                 <div className="camisas-lista-admin">
                   {pedido.camisas && pedido.camisas.map((camisa, index) => {
                     const precioCamisa = camisa.tipo === 'directiva_zona' ? 7 : 10
+                    
+                    // Buscar si esta camisa está entregada
+                    const entregaCamisa = entregasCamisas.find(e => 
+                      e.pedido_id === pedido.id &&
+                      e.tipo_camisa === camisa.tipo && 
+                      e.talla === camisa.talla && 
+                      e.nombre_camisa === camisa.nombre &&
+                      e.texto_frente === camisa.texto_frente
+                    )
+                    const estaEntregada = entregaCamisa?.entregada || false
+
                     return (
-                      <div key={index} className="camisa-item-admin">
+                      <div key={index} className={`camisa-item-admin ${estaEntregada ? 'entregada' : ''}`}>
                         <div className="camisa-numero-admin">Camisa #{index + 1}</div>
                         <div className="camisa-detalles-admin">
-                          <span className="camisa-tipo-badge">
-                            {camisa.tipo === 'normal' && '👕 Normal'}
-                            {camisa.tipo === 'directiva_club' && '🎖️ Dir. Club'}
-                            {camisa.tipo === 'directiva_zona' && '👔 Dir. ZONA'}
-                          </span>
-                          <span className="camisa-talla-badge">Talla: {camisa.talla}</span>
-                          <span className="camisa-precio-badge">${precioCamisa}</span>
+                          <div className="camisa-badges-row">
+                            <span className="camisa-tipo-badge">
+                              {camisa.tipo === 'normal' && '👕 Normal'}
+                              {camisa.tipo === 'directiva_club' && '🎖️ Dir. Club'}
+                              {camisa.tipo === 'directiva_zona' && '👔 Dir. ZONA'}
+                            </span>
+                            <span className="camisa-talla-badge">Talla: {camisa.talla}</span>
+                            <span className="camisa-precio-badge">${precioCamisa}</span>
+                            {estaEntregada && (
+                              <span className="tag-entregada-admin">✅ Entregada</span>
+                            )}
+                          </div>
                           {camisa.texto_frente && (
                             <div className="camisa-personalizacion">
                               <strong>Frente:</strong> {camisa.texto_frente}
@@ -871,6 +918,11 @@ function PanelAdmin() {
                           {camisa.nombre && (
                             <div className="camisa-personalizacion">
                               <strong>Detrás:</strong> {camisa.nombre}
+                            </div>
+                          )}
+                          {estaEntregada && entregaCamisa.fecha_entrega && (
+                            <div className="camisa-fecha-entrega-admin">
+                              📅 Entregada: {new Date(entregaCamisa.fecha_entrega).toLocaleDateString('es-ES')}
                             </div>
                           )}
                         </div>

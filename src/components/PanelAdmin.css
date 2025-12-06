@@ -116,17 +116,67 @@
   gap: 1rem;
 }
 
+/* Barra de búsqueda y botón de filtros */
+.barra-busqueda-filtros {
+  display: flex;
+  gap: 1rem;
+}
+
 .busqueda-input {
+  flex: 1;
   padding: 1rem;
   border: 2px solid #e0e0e0;
   border-radius: 15px;
   font-size: 1rem;
-  width: 100%;
 }
 
 .busqueda-input:focus {
   outline: none;
   border-color: #667eea;
+}
+
+.btn-toggle-filtros {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-toggle-filtros:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-toggle-filtros.activo {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+/* Filtros colapsables */
+.filtros-admin-colapsables {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filtros {
@@ -327,6 +377,15 @@
     font-size: 2rem;
   }
 
+  .barra-busqueda-filtros {
+    flex-direction: column;
+  }
+
+  .btn-toggle-filtros {
+    width: 100%;
+    justify-content: center;
+  }
+
   .pedido-card {
     padding: 1rem;
   }
@@ -383,6 +442,12 @@
   border-left: 4px solid #667eea;
   border-radius: 10px;
   padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.camisa-item-admin.entregada {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-left-color: #28a745;
 }
 
 .camisa-numero-admin {
@@ -396,6 +461,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.camisa-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .camisa-tipo-badge {
@@ -429,8 +501,24 @@
 
 .camisa-personalizacion strong {
   color: #333;
-  margin-right: 0.5rem;
-  text-transform: none;
+}
+
+.tag-entregada-admin {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camisa-fecha-entrega-admin {
+  color: #28a745;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(40, 167, 69, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -901,6 +989,7 @@
   background: white;
   border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
 }
 
 .fecha-input-group {
