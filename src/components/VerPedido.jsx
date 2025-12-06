@@ -15,6 +15,7 @@ function VerPedido() {
   const [montoPago, setMontoPago] = useState('')
   const [referenciaPago, setReferenciaPago] = useState('')
   const [fechaPago, setFechaPago] = useState('')
+  const [entregasCamisas, setEntregasCamisas] = useState([])
 
   useEffect(() => {
     cargarPedido()
@@ -40,12 +41,28 @@ function VerPedido() {
         setError('Pedido no encontrado')
       } else {
         setPedido(data)
+        // Cargar entregas de camisas
+        await cargarEntregasCamisas(data.id)
       }
     } catch (error) {
       console.error('Error:', error)
       setError('No se pudo cargar el pedido. Verifica el código.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const cargarEntregasCamisas = async (pedidoId) => {
+    try {
+      const { data, error } = await supabase
+        .from('entregas_camisas')
+        .select('*')
+        .eq('pedido_id', pedidoId)
+
+      if (error) throw error
+      setEntregasCamisas(data || [])
+    } catch (error) {
+      console.error('Error al cargar entregas:', error)
     }
   }
 
@@ -134,25 +151,46 @@ function VerPedido() {
         <div className="camisas-section-ver">
           <h3>👕 Camisas del Pedido ({pedido.total_camisas})</h3>
           <div className="camisas-lista-ver">
-            {pedido.camisas && pedido.camisas.map((camisa, index) => (
-              <div key={index} className="camisa-item-ver">
-                <div className="camisa-numero-ver">#{index + 1}</div>
-                <div className="camisa-detalles-ver">
-                  <div className="camisa-tipo-ver">
-                    {camisa.tipo === 'normal' && '👕 Normal'}
-                    {camisa.tipo === 'directiva_club' && '🎖️ Directiva Club'}
-                    {camisa.tipo === 'directiva_zona' && '👔 Directiva ZONA'}
+            {pedido.camisas && pedido.camisas.map((camisa, index) => {
+              // Buscar si esta camisa está entregada
+              const entregaCamisa = entregasCamisas.find(e => 
+                e.tipo_camisa === camisa.tipo && 
+                e.talla === camisa.talla && 
+                e.nombre_camisa === camisa.nombre &&
+                e.texto_frente === camisa.texto_frente
+              )
+              const estaEntregada = entregaCamisa?.entregada || false
+
+              return (
+                <div key={index} className={`camisa-item-ver ${estaEntregada ? 'entregada' : ''}`}>
+                  <div className="camisa-numero-ver">#{index + 1}</div>
+                  <div className="camisa-detalles-ver">
+                    <div className="camisa-header-info">
+                      <div className="camisa-tipo-ver">
+                        {camisa.tipo === 'normal' && '👕 Normal'}
+                        {camisa.tipo === 'directiva_club' && '🎖️ Directiva Club'}
+                        {camisa.tipo === 'directiva_zona' && '👔 Directiva ZONA'}
+                      </div>
+                      {estaEntregada && (
+                        <span className="tag-entregada">✅ Entregada</span>
+                      )}
+                    </div>
+                    <div className="camisa-talla-ver">Talla: {camisa.talla}</div>
+                    {camisa.texto_frente && (
+                      <div className="camisa-texto-ver">Frente: {camisa.texto_frente}</div>
+                    )}
+                    {camisa.nombre && (
+                      <div className="camisa-texto-ver">Detrás: {camisa.nombre}</div>
+                    )}
+                    {estaEntregada && entregaCamisa.fecha_entrega && (
+                      <div className="camisa-fecha-entrega-ver">
+                        📅 {new Date(entregaCamisa.fecha_entrega).toLocaleDateString('es-ES')}
+                      </div>
+                    )}
                   </div>
-                  <div className="camisa-talla-ver">Talla: {camisa.talla}</div>
-                  {camisa.texto_frente && (
-                    <div className="camisa-texto-ver">Frente: {camisa.texto_frente}</div>
-                  )}
-                  {camisa.nombre && (
-                    <div className="camisa-texto-ver">Detrás: {camisa.nombre}</div>
-                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 

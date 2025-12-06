@@ -23,6 +23,11 @@ function PanelEntregas({ standalone = false }) {
   const [procesandoEntrega, setProcesandoEntrega] = useState(false)
   const [entregaExitosa, setEntregaExitosa] = useState(false)
   const [cantidadEntregada, setCantidadEntregada] = useState(0)
+  const [procesandoDeshacer, setProcesandoDeshacer] = useState(false)
+  const [deshacerExitoso, setDeshacerExitoso] = useState(false)
+  const [mostrarModalDeshacerPedido, setMostrarModalDeshacerPedido] = useState(false)
+  const [pedidoADeshacer, setPedidoADeshacer] = useState(null)
+  const [filtroPago, setFiltroPago] = useState('todos')
 
   useEffect(() => {
     cargarCamisas()
@@ -151,6 +156,9 @@ function PanelEntregas({ standalone = false }) {
 
     if (!camisaADeshacer) return
 
+    setProcesandoDeshacer(true)
+    setDeshacerExitoso(false)
+
     try {
       const { error } = await supabase
         .from('entregas_camisas')
@@ -163,12 +171,77 @@ function PanelEntregas({ standalone = false }) {
 
       if (error) throw error
 
-      cerrarModalDeshacer()
-      cargarCamisas()
-      alert('✅ Entrega deshecha correctamente')
+      setProcesandoDeshacer(false)
+      setDeshacerExitoso(true)
+
+      await cargarCamisas()
+
+      setTimeout(() => {
+        cerrarModalDeshacer()
+        setDeshacerExitoso(false)
+      }, 2000)
     } catch (error) {
       console.error('Error:', error)
+      setProcesandoDeshacer(false)
       alert('❌ Error al deshacer entrega')
+    }
+  }
+
+  const abrirModalDeshacerPedido = (pedido) => {
+    setPedidoADeshacer(pedido)
+    setMostrarModalDeshacerPedido(true)
+  }
+
+  const cerrarModalDeshacerPedido = () => {
+    setMostrarModalDeshacerPedido(false)
+    setPedidoADeshacer(null)
+  }
+
+  const deshacerPedidoCompleto = async () => {
+    const codigo = prompt('🔐 Ingresa el código de seguridad para deshacer todas las entregas del pedido:')
+    
+    if (codigo !== 'leonel') {
+      alert('❌ Código incorrecto')
+      return
+    }
+
+    if (!pedidoADeshacer) return
+
+    const camisasEntregadas = pedidoADeshacer.camisas.filter(c => c.entregada)
+    if (camisasEntregadas.length === 0) {
+      alert('⚠️ No hay camisas entregadas en este pedido')
+      return
+    }
+
+    setProcesandoDeshacer(true)
+    setDeshacerExitoso(false)
+
+    try {
+      const { error } = await supabase
+        .from('entregas_camisas')
+        .update({
+          entregada: false,
+          fecha_entrega: null,
+          entregado_por: null
+        })
+        .in('id', camisasEntregadas.map(c => c.id))
+
+      if (error) throw error
+
+      setProcesandoDeshacer(false)
+      setDeshacerExitoso(true)
+      setCantidadEntregada(camisasEntregadas.length)
+
+      await cargarCamisas()
+
+      setTimeout(() => {
+        cerrarModalDeshacerPedido()
+        setDeshacerExitoso(false)
+      }, 2000)
+    } catch (error) {
+      console.error('Error:', error)
+      setProcesandoDeshacer(false)
+      alert('❌ Error al deshacer entregas del pedido')
     }
   }
 
@@ -184,6 +257,7 @@ function PanelEntregas({ standalone = false }) {
     setFiltroTalla('todas')
     setFiltroTipo('todos')
     setFiltroEstado('pendientes')
+    setFiltroPago('todos')
   }
 
   const verPedidoCompleto = async (codigoUnico) => {
@@ -271,27 +345,33 @@ function PanelEntregas({ standalone = false }) {
       (filtroEstado === 'entregadas' && camisa.entregada) ||
       (filtroEstado === 'pendientes' && !camisa.entregada)
 
-    return cumpleBusqueda && cumpleTalla && cumpleTipo && cumpleEstado
+    // Filtro por pago
+    const cumplePago = 
+      filtroPago === 'todos' ||
+      (filtroPago === 'pagadas' && camisa.pedidos?.pagado) ||
+      (filtroPago === 'no_pagadas' && !camisa.pedidos?.pagado)
+
+    return cumpleBusqueda && cumpleTalla && cumpleTipo && cumpleEstado && cumplePago
   })
 
-  // Estadísticas de camisas
+  // Estadísticas de camisas (basadas en filtros)
   const stats = {
-    total: camisas.length,
-    entregadas: camisas.filter(c => c.entregada).length,
-    pendientes: camisas.filter(c => !c.entregada).length
+    total: camisasFiltradas.length,
+    entregadas: camisasFiltradas.filter(c => c.entregada).length,
+    pendientes: camisasFiltradas.filter(c => !c.entregada).length
   }
 
-  // Estadísticas de pedidos (agrupando por pedido_id)
-  const pedidosUnicos = [...new Set(camisas.map(c => c.pedido_id))]
+  // Estadísticas de pedidos (agrupando por pedido_id, basadas en filtros)
+  const pedidosUnicosFiltrados = [...new Set(camisasFiltradas.map(c => c.pedido_id))]
   const pedidosStats = {
-    total: pedidosUnicos.length,
-    entregados: pedidosUnicos.filter(pedidoId => {
-      const camisasPedido = camisas.filter(c => c.pedido_id === pedidoId)
-      return camisasPedido.every(c => c.entregada)
+    total: pedidosUnicosFiltrados.length,
+    entregados: pedidosUnicosFiltrados.filter(pedidoId => {
+      const camisasPedido = camisasFiltradas.filter(c => c.pedido_id === pedidoId)
+      return camisasPedido.length > 0 && camisasPedido.every(c => c.entregada)
     }).length,
-    pendientes: pedidosUnicos.filter(pedidoId => {
-      const camisasPedido = camisas.filter(c => c.pedido_id === pedidoId)
-      return !camisasPedido.every(c => c.entregada)
+    pendientes: pedidosUnicosFiltrados.filter(pedidoId => {
+      const camisasPedido = camisasFiltradas.filter(c => c.pedido_id === pedidoId)
+      return camisasPedido.some(c => !c.entregada)
     }).length
   }
 
@@ -423,6 +503,16 @@ function PanelEntregas({ standalone = false }) {
 
           <select
             className="filtro-select"
+            value={filtroPago}
+            onChange={(e) => setFiltroPago(e.target.value)}
+          >
+            <option value="todos">Todos los pagos</option>
+            <option value="pagadas">💳 Pagadas</option>
+            <option value="no_pagadas">💰 No Pagadas</option>
+          </select>
+
+          <select
+            className="filtro-select"
             value={filtroTipo}
             onChange={(e) => setFiltroTipo(e.target.value)}
           >
@@ -455,7 +545,7 @@ function PanelEntregas({ standalone = false }) {
           <button 
             className="btn-reiniciar-filtros"
             onClick={reiniciarFiltros}
-            disabled={!busqueda && filtroTalla === 'todas' && filtroTipo === 'todos' && filtroEstado === 'pendientes'}
+            disabled={!busqueda && filtroTalla === 'todas' && filtroTipo === 'todos' && filtroEstado === 'pendientes' && filtroPago === 'todos'}
           >
             🔄 Reiniciar Filtros
           </button>
@@ -636,6 +726,14 @@ function PanelEntregas({ standalone = false }) {
                       >
                         👁️ Ver Pedido Completo
                       </button>
+                      {algunaEntregada && (
+                        <button 
+                          className="btn-deshacer-pedido-completo"
+                          onClick={() => abrirModalDeshacerPedido(pedido)}
+                        >
+                          ↩️ Deshacer Pedido Completo
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -866,40 +964,124 @@ function PanelEntregas({ standalone = false }) {
             </div>
 
             <div className="modal-body-deshacer">
-              <div className="icono-advertencia">
-                <span className="icono-warning">⚠️</span>
-              </div>
-              <p className="texto-advertencia">
-                ¿Estás seguro de deshacer la entrega de esta camisa?
-              </p>
-              <div className="info-camisa-deshacer">
-                <p><strong>Tipo:</strong> {
-                  camisaADeshacer.tipo_camisa === 'normal' ? '👕 Normal' :
-                  camisaADeshacer.tipo_camisa === 'directiva_club' ? '🎖️ Dir. Club' :
-                  '👔 Dir. ZONA'
-                }</p>
-                <p><strong>Talla:</strong> {camisaADeshacer.talla}</p>
-                {camisaADeshacer.nombre_camisa && <p><strong>Nombre:</strong> {camisaADeshacer.nombre_camisa}</p>}
-              </div>
-              <p className="nota-seguridad">
-                🔐 Se te pedirá un código de seguridad para confirmar esta acción.
-              </p>
+              {procesandoDeshacer ? (
+                <div className="estado-procesando">
+                  <div className="spinner-container">
+                    <div className="spinner"></div>
+                  </div>
+                  <p className="texto-procesando">Deshaciendo entrega...</p>
+                </div>
+              ) : deshacerExitoso ? (
+                <div className="estado-exitoso">
+                  <div className="icono-exito">✅</div>
+                  <h3 className="titulo-exito">¡Entrega Deshecha!</h3>
+                  <p className="texto-exito">La camisa ha sido marcada como pendiente</p>
+                </div>
+              ) : (
+                <>
+                  <div className="icono-advertencia">
+                    <span className="icono-warning">⚠️</span>
+                  </div>
+                  <p className="texto-advertencia">
+                    ¿Estás seguro de deshacer la entrega de esta camisa?
+                  </p>
+                  <div className="info-camisa-deshacer">
+                    <p><strong>Tipo:</strong> {
+                      camisaADeshacer.tipo_camisa === 'normal' ? '👕 Normal' :
+                      camisaADeshacer.tipo_camisa === 'directiva_club' ? '🎖️ Dir. Club' :
+                      '👔 Dir. ZONA'
+                    }</p>
+                    <p><strong>Talla:</strong> {camisaADeshacer.talla}</p>
+                    {camisaADeshacer.nombre_camisa && <p><strong>Nombre:</strong> {camisaADeshacer.nombre_camisa}</p>}
+                  </div>
+                  <p className="nota-seguridad">
+                    🔐 Se te pedirá un código de seguridad para confirmar esta acción.
+                  </p>
+                </>
+              )}
             </div>
 
-            <div className="modal-footer-deshacer">
-              <button 
-                className="btn-cancelar-deshacer"
-                onClick={cerrarModalDeshacer}
-              >
-                Cancelar
-              </button>
-              <button 
-                className="btn-confirmar-deshacer"
-                onClick={deshacerEntrega}
-              >
-                ↩️ Deshacer Entrega
-              </button>
+            {!procesandoDeshacer && !deshacerExitoso && (
+              <div className="modal-footer-deshacer">
+                <button 
+                  className="btn-cancelar-deshacer"
+                  onClick={cerrarModalDeshacer}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  className="btn-confirmar-deshacer"
+                  onClick={deshacerEntrega}
+                >
+                  ↩️ Deshacer Entrega
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Deshacer Pedido Completo */}
+      {mostrarModalDeshacerPedido && pedidoADeshacer && (
+        <div className="modal-overlay-deshacer" onClick={cerrarModalDeshacerPedido}>
+          <div className="modal-content-deshacer" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-deshacer">
+              <h3 className="modal-title-deshacer">⚠️ Deshacer Pedido Completo</h3>
+              <button className="modal-close-deshacer" onClick={cerrarModalDeshacerPedido}>✕</button>
             </div>
+
+            <div className="modal-body-deshacer">
+              {procesandoDeshacer ? (
+                <div className="estado-procesando">
+                  <div className="spinner-container">
+                    <div className="spinner"></div>
+                  </div>
+                  <p className="texto-procesando">Deshaciendo entregas del pedido...</p>
+                </div>
+              ) : deshacerExitoso ? (
+                <div className="estado-exitoso">
+                  <div className="icono-exito">✅</div>
+                  <h3 className="titulo-exito">¡Pedido Deshecho!</h3>
+                  <p className="texto-exito">
+                    {cantidadEntregada} camisa{cantidadEntregada > 1 ? 's' : ''} marcada{cantidadEntregada > 1 ? 's' : ''} como pendiente{cantidadEntregada > 1 ? 's' : ''}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="icono-advertencia">
+                    <span className="icono-warning">⚠️</span>
+                  </div>
+                  <p className="texto-advertencia">
+                    ¿Estás seguro de deshacer TODAS las entregas de este pedido?
+                  </p>
+                  <div className="info-camisa-deshacer">
+                    <p><strong>Persona:</strong> {pedidoADeshacer.nombrePersona}</p>
+                    <p><strong>Iglesia:</strong> {pedidoADeshacer.iglesia}</p>
+                    <p><strong>Camisas entregadas:</strong> {pedidoADeshacer.camisas.filter(c => c.entregada).length}</p>
+                  </div>
+                  <p className="nota-seguridad">
+                    🔐 Se te pedirá un código de seguridad para confirmar esta acción.
+                  </p>
+                </>
+              )}
+            </div>
+
+            {!procesandoDeshacer && !deshacerExitoso && (
+              <div className="modal-footer-deshacer">
+                <button 
+                  className="btn-cancelar-deshacer"
+                  onClick={cerrarModalDeshacerPedido}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  className="btn-confirmar-deshacer"
+                  onClick={deshacerPedidoCompleto}
+                >
+                  ↩️ Deshacer Pedido Completo
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
