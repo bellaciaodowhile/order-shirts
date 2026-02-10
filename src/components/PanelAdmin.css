@@ -586,6 +586,14 @@
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
+.btn-exportar.warning {
+  background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+}
+
+.btn-exportar.warning:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+}
+
 .btn-exportar:disabled {
   opacity: 0.5;
   cursor: not-allowed;

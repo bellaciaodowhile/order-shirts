@@ -443,6 +443,55 @@ function PanelAdmin() {
     XLSX.writeFile(wb, `resumen_tallas_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
+  const exportarPendientesPago = () => {
+    // Filtrar solo pedidos pendientes de pago
+    const pedidosPendientes = pedidosFiltrados.filter(pedido => !pedido.pagado)
+    
+    if (pedidosPendientes.length === 0) {
+      alert('No hay personas pendientes de pago')
+      return
+    }
+
+    // Crear lista de personas pendientes con sus detalles
+    const personasPendientes = pedidosPendientes.map(pedido => {
+      const totalDolares = pedido.camisas && Array.isArray(pedido.camisas) 
+        ? calcularTotalPedido(pedido.camisas) 
+        : 0
+      const totalBs = dolarHoy ? totalDolares * dolarHoy.precio : 0
+
+      return {
+        'Nombre': pedido.nombre_persona,
+        'Iglesia': pedido.iglesia,
+        'Celular': pedido.celular,
+        'Total Camisas': pedido.total_camisas,
+        'Total USD': `$${totalDolares.toFixed(2)}`,
+        'Total Bs': dolarHoy ? `Bs. ${totalBs.toFixed(2)}` : 'N/A',
+        'Fecha Pedido': new Date(pedido.created_at).toLocaleDateString('es-ES')
+      }
+    })
+
+    // Crear libro de Excel
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.json_to_sheet(personasPendientes)
+    
+    // Ajustar ancho de columnas
+    const colWidths = [
+      { wch: 25 }, // Nombre
+      { wch: 25 }, // Iglesia
+      { wch: 15 }, // Celular
+      { wch: 12 }, // Total Camisas
+      { wch: 12 }, // Total USD
+      { wch: 15 }, // Total Bs
+      { wch: 15 }  // Fecha Pedido
+    ]
+    ws['!cols'] = colWidths
+    
+    XLSX.utils.book_append_sheet(wb, ws, 'Pendientes de Pago')
+    
+    // Descargar archivo
+    XLSX.writeFile(wb, `pendientes_pago_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
   if (loading) {
     return (
       <div className="panel-container">
@@ -703,6 +752,13 @@ function PanelAdmin() {
               disabled={pedidosFiltrados.length === 0}
             >
               📊 Exportar Resumen (Excel)
+            </button>
+            <button 
+              className="btn-exportar warning"
+              onClick={exportarPendientesPago}
+              disabled={pedidosFiltrados.filter(p => !p.pagado).length === 0}
+            >
+              ⏳ Exportar Pendientes de Pago
             </button>
           </div>
         </div>
